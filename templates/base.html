@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1"
+    >
+    <meta
+        name="description"
+        content="A virtual memorial candle page for {{ memorial_name }}."
+    >
+    <title>{% block title %}A Light for {{ memorial_name }}{% endblock %}</title>
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='styles.css') }}"
+    >
+</head>
+<body>
+    {% block body %}{% endblock %}
+</body>
+</html>

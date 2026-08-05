@@ -1,0 +1,100 @@
+{% extends "base.html" %}
+
+{% block title %}Manage Memorial Candles{% endblock %}
+
+{% block body %}
+<main class="admin-shell">
+    <section class="admin-card">
+        <div class="admin-heading">
+            <div>
+                <p class="section-kicker">Private moderation</p>
+                <h1>Manage Memorial Candles</h1>
+            </div>
+
+            <div class="admin-actions">
+                <a
+                    class="secondary-button inline-button"
+                    href="{{ url_for('memorial_page') }}"
+                    target="_blank"
+                >
+                    View Memorial
+                </a>
+
+                <form method="post" action="{{ url_for('admin_logout') }}">
+                    <input
+                        type="hidden"
+                        name="_csrf_token"
+                        value="{{ csrf_token() }}"
+                    >
+                    <button class="danger-button" type="submit">
+                        Sign Out
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        {% with notices = get_flashed_messages(with_categories=true) %}
+            {% for category, notice in notices %}
+                <div class="notice notice-{{ category }}">
+                    {{ notice }}
+                </div>
+            {% endfor %}
+        {% endwith %}
+
+        <div class="admin-list">
+            {% for candle in candles %}
+                <article class="admin-row">
+                    <div>
+                        <div class="admin-name">
+                            {{ candle.participant_name }}
+                            {% if not candle.is_visible %}
+                                <span class="hidden-badge">Hidden</span>
+                            {% endif %}
+                        </div>
+
+                        <p>{{ candle.message or "No message" }}</p>
+                        <small>
+                            {{ candle.created_at.strftime("%d %b %Y, %H:%M") }}
+                        </small>
+                    </div>
+
+                    <div class="row-actions">
+                        <form
+                            method="post"
+                            action="{{ url_for('toggle_candle', candle_id=candle.id) }}"
+                        >
+                            <input
+                                type="hidden"
+                                name="_csrf_token"
+                                value="{{ csrf_token() }}"
+                            >
+                            <button class="secondary-button" type="submit">
+                                {% if candle.is_visible %}Hide{% else %}Show{% endif %}
+                            </button>
+                        </form>
+
+                        <form
+                            method="post"
+                            action="{{ url_for('delete_candle', candle_id=candle.id) }}"
+                            onsubmit="return confirm('Delete this candle permanently?')"
+                        >
+                            <input
+                                type="hidden"
+                                name="_csrf_token"
+                                value="{{ csrf_token() }}"
+                            >
+                            <button class="danger-button" type="submit">
+                                Delete
+                            </button>
+                        </form>
+                    </div>
+                </article>
+            {% else %}
+                <div class="empty-wall">
+                    No candles have been submitted.
+                </div>
+            {% endfor %}
+        </div>
+    </section>
+</main>
+{% endblock %}

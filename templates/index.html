@@ -1,0 +1,260 @@
+{% extends "base.html" %}
+
+{% block body %}
+<main class="page-shell">
+    {% with notices = get_flashed_messages(with_categories=true) %}
+        {% if notices %}
+            <div class="notices" aria-live="polite">
+                {% for category, notice in notices %}
+                    <div class="notice notice-{{ category }}">
+                        {{ notice }}
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+    {% endwith %}
+
+    <section class="hero">
+        <div class="soft-light soft-light-one"></div>
+        <div class="soft-light soft-light-two"></div>
+
+        <div class="hero-content">
+            <img
+                class="memorial-photo"
+                src="{{ photo_url }}"
+                alt="Memorial portrait of {{ memorial_name }}"
+            >
+
+            <p class="eyebrow">🕊️ In Loving Memory</p>
+            <h1>{{ memorial_name }}</h1>
+            <p class="memorial-message">{{ memorial_message }}</p>
+
+            <div class="burial-details">
+                <div>📅 {{ burial_date }}</div>
+
+                {% if burial_venue %}
+                    <div>📍 {{ burial_venue }}</div>
+                {% endif %}
+            </div>
+
+            <div class="candle-count">
+                <span aria-hidden="true">🕯️</span>
+                <strong>{{ candle_count }}</strong>
+                candle{% if candle_count != 1 %}s{% endif %} lit
+            </div>
+
+            <a class="primary-link" href="#light-candle">
+                Light a Candle
+            </a>
+        </div>
+    </section>
+
+    <section class="content-grid">
+        <article class="card" id="light-candle">
+            <p class="section-kicker">A moment of remembrance</p>
+            <h2>🕯️ Light a Virtual Candle</h2>
+            <p class="muted">
+                Lighting a candle is free. Add your name and an optional
+                prayer, memory, or tribute.
+            </p>
+
+            <form method="post" action="{{ url_for('light_candle') }}">
+                <input
+                    type="hidden"
+                    name="_csrf_token"
+                    value="{{ csrf_token() }}"
+                >
+
+                <div class="honeypot" aria-hidden="true">
+                    <label for="website">Website</label>
+                    <input
+                        id="website"
+                        name="website"
+                        tabindex="-1"
+                        autocomplete="off"
+                    >
+                </div>
+
+                <label for="participant_name">
+                    Your name
+                    <span class="optional">optional</span>
+                </label>
+                <input
+                    id="participant_name"
+                    name="participant_name"
+                    maxlength="80"
+                    placeholder="Leave blank to appear as Anonymous"
+                >
+
+                <label for="message">
+                    Tribute message
+                    <span class="optional">optional</span>
+                </label>
+                <textarea
+                    id="message"
+                    name="message"
+                    maxlength="280"
+                    placeholder="Share a prayer, memory, or message..."
+                ></textarea>
+
+                <button class="primary-button" type="submit">
+                    <span aria-hidden="true">🕯️</span>
+                    Light My Candle
+                </button>
+            </form>
+
+            <p class="privacy-note">
+                Your phone number is not requested or displayed.
+            </p>
+        </article>
+
+        <article class="card support-card">
+            <p class="section-kicker">Optional family support</p>
+            <h2>🤍 Burial Contribution</h2>
+            <p class="muted">
+                Contributions are optional and will help the family meet
+                funeral and burial expenses.
+            </p>
+
+            <div class="mpesa-panel">
+                <span class="mpesa-label">Send via M-Pesa</span>
+                <strong id="mpesaNumber">{{ mpesa_number }}</strong>
+
+                <dl>
+                    <div>
+                        <dt>Account name</dt>
+                        <dd>{{ mpesa_name }}</dd>
+                    </div>
+                    <div>
+                        <dt>Purpose</dt>
+                        <dd>{{ contribution_purpose }}</dd>
+                    </div>
+
+                    {% if organizer_phone %}
+                        <div>
+                            <dt>Confirmation contact</dt>
+                            <dd>{{ organizer_phone }}</dd>
+                        </div>
+                    {% endif %}
+                </dl>
+            </div>
+
+            <button
+                class="secondary-button"
+                type="button"
+                onclick="copyMpesaNumber()"
+            >
+                Copy M-Pesa Number
+            </button>
+
+            <button
+                class="whatsapp-button"
+                type="button"
+                onclick="shareOnWhatsApp()"
+            >
+                Share on WhatsApp
+            </button>
+
+            <p class="privacy-note">
+                Please verify the recipient's name before completing an
+                M-Pesa transaction.
+            </p>
+        </article>
+    </section>
+
+    <section class="card candle-wall" id="candle-wall">
+        <div class="wall-heading">
+            <div>
+                <p class="section-kicker">Together in remembrance</p>
+                <h2>Memorial Candle Wall</h2>
+            </div>
+
+            <span class="wall-total">
+                {{ candle_count }} candle{% if candle_count != 1 %}s{% endif %}
+            </span>
+        </div>
+
+        <div class="candles">
+            {% for candle in candles %}
+                <article class="candle-card">
+                    <div class="candle-art" aria-hidden="true">
+                        <div class="flame"></div>
+                        <div class="wick"></div>
+                        <div class="wax">
+                            <div class="wax-shine"></div>
+                        </div>
+                    </div>
+
+                    <h3>{{ candle.participant_name }}</h3>
+
+                    {% if candle.message %}
+                        <blockquote>“{{ candle.message }}”</blockquote>
+                    {% else %}
+                        <p class="silent-tribute">
+                            Lit a candle in loving memory.
+                        </p>
+                    {% endif %}
+
+                    <time datetime="{{ candle.created_at.isoformat() }}">
+                        {{ candle.created_at.strftime("%d %b %Y, %H:%M") }}
+                    </time>
+                </article>
+            {% else %}
+                <div class="empty-wall">
+                    <span aria-hidden="true">🕯️</span>
+                    <h3>Be the first to light a candle</h3>
+                    <p>Your light will begin this memorial wall.</p>
+                </div>
+            {% endfor %}
+        </div>
+    </section>
+
+    <footer>
+        <p>Made with love in memory of {{ memorial_name }}.</p>
+        <p>© {{ current_year }} Family Memorial</p>
+    </footer>
+</main>
+
+<div id="copyMessage" class="copy-message" role="status" aria-live="polite">
+    M-Pesa number copied
+</div>
+
+<script>
+    const memorialName = {{ memorial_name|tojson }};
+    const mpesaNumber = {{ mpesa_number|tojson }};
+
+    async function copyMpesaNumber() {
+        try {
+            await navigator.clipboard.writeText(mpesaNumber);
+            showCopyMessage("M-Pesa number copied");
+        } catch (error) {
+            window.prompt("Copy the M-Pesa number:", mpesaNumber);
+        }
+    }
+
+    function showCopyMessage(message) {
+        const element = document.getElementById("copyMessage");
+        element.textContent = message;
+        element.classList.add("visible");
+
+        window.setTimeout(function () {
+            element.classList.remove("visible");
+        }, 2200);
+    }
+
+    function shareOnWhatsApp() {
+        const message = [
+            "Please join us in lighting a virtual candle in memory of",
+            memorialName + ".",
+            "Lighting a candle is free.",
+            "Burial support through the family's M-Pesa details is optional.",
+            window.location.href
+        ].join(" ");
+
+        const whatsappUrl =
+            "https://wa.me/?text=" + encodeURIComponent(message);
+
+        window.open(whatsappUrl, "_blank", "noopener,noreferrer");
+    }
+</script>
+{% endblock %}
