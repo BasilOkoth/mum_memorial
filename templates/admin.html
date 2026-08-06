@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}Manage Memorial Candles{% endblock %}
+{% block title %}Manage Condolence Book{% endblock %}
 
 {% block body %}
 <main class="admin-shell">
@@ -8,7 +8,11 @@
         <div class="admin-heading">
             <div>
                 <p class="section-kicker">Private moderation</p>
-                <h1>Manage Memorial Candles</h1>
+                <h1>Manage Condolence Book</h1>
+                <p class="admin-intro">
+                    Review messages before deciding whether they should remain
+                    visible in the public condolence book.
+                </p>
             </div>
 
             <div class="admin-actions">
@@ -16,8 +20,9 @@
                     class="secondary-button inline-button"
                     href="{{ url_for('memorial_page') }}"
                     target="_blank"
+                    rel="noopener noreferrer"
                 >
-                    View Memorial
+                    View Condolence Book
                 </a>
 
                 <form method="post" action="{{ url_for('admin_logout') }}">
@@ -47,14 +52,18 @@
                     <div>
                         <div class="admin-name">
                             {{ candle.participant_name }}
+
                             {% if not candle.is_visible %}
                                 <span class="hidden-badge">Hidden</span>
                             {% endif %}
                         </div>
 
-                        <p>{{ candle.message or "No message" }}</p>
+                        <p>
+                            {{ candle.message or "Candle lit without a written message." }}
+                        </p>
+
                         <small>
-                            {{ candle.created_at.strftime("%d %b %Y, %H:%M") }}
+                            Signed {{ candle.created_at.strftime("%d %b %Y, %H:%M") }}
                         </small>
                     </div>
 
@@ -69,14 +78,18 @@
                                 value="{{ csrf_token() }}"
                             >
                             <button class="secondary-button" type="submit">
-                                {% if candle.is_visible %}Hide{% else %}Show{% endif %}
+                                {% if candle.is_visible %}
+                                    Hide Entry
+                                {% else %}
+                                    Show Entry
+                                {% endif %}
                             </button>
                         </form>
 
                         <form
                             method="post"
                             action="{{ url_for('delete_candle', candle_id=candle.id) }}"
-                            onsubmit="return confirm('Delete this candle permanently?')"
+                            onsubmit="return confirm('Delete this condolence entry permanently?')"
                         >
                             <input
                                 type="hidden"
@@ -91,7 +104,7 @@
                 </article>
             {% else %}
                 <div class="empty-wall">
-                    No candles have been submitted.
+                    No condolence messages have been submitted.
                 </div>
             {% endfor %}
         </div>
