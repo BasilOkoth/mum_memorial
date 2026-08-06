@@ -1,0 +1,223 @@
+/*
+ * Digital condolence book enhancements.
+ * Loaded after the existing premium and live-candle styles.
+ */
+
+.condolence-form-panel {
+    position: relative;
+    overflow: hidden;
+    border-color: rgba(217, 182, 111, 0.2);
+}
+
+.condolence-form-panel::after {
+    content: "";
+    position: absolute;
+    width: 190px;
+    height: 190px;
+    right: -95px;
+    bottom: -105px;
+    border-radius: 50%;
+    pointer-events: none;
+    background: radial-gradient(
+        circle,
+        rgba(217, 182, 111, 0.12),
+        transparent 70%
+    );
+}
+
+.field-help {
+    display: block;
+    color: #77736d;
+    font-size: 0.7rem;
+    line-height: 1.45;
+}
+
+.sign-book-button {
+    position: relative;
+    z-index: 1;
+    margin-top: 2px;
+}
+
+.button-flame {
+    width: 9px;
+    height: 15px;
+    display: inline-block;
+    border-radius: 60% 40% 55% 45% / 70% 65% 35% 30%;
+    transform-origin: 50% 100%;
+    background: linear-gradient(
+        #fff8d8,
+        #f5c85e 48%,
+        #bd5522
+    );
+    box-shadow:
+        0 0 7px rgba(255, 233, 167, 0.9),
+        0 0 15px rgba(245, 158, 11, 0.46);
+    animation: living-flame 1.1s ease-in-out infinite alternate;
+}
+
+.condolence-book {
+    position: relative;
+    overflow: hidden;
+}
+
+.condolence-book::before {
+    content: "";
+    position: absolute;
+    inset: 0 auto 0 0;
+    width: 3px;
+    border-radius: 28px 0 0 28px;
+    background: linear-gradient(
+        transparent,
+        rgba(217, 182, 111, 0.45) 18%,
+        rgba(217, 182, 111, 0.45) 82%,
+        transparent
+    );
+}
+
+.book-introduction {
+    max-width: 700px;
+    margin: -8px 0 26px;
+    color: var(--premium-muted);
+    line-height: 1.65;
+}
+
+.condolence-entries {
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+}
+
+.condolence-entry {
+    min-height: 230px;
+    padding: 22px;
+}
+
+.condolence-entry::after {
+    content: "“";
+    position: absolute;
+    right: 17px;
+    top: 7px;
+    color: rgba(217, 182, 111, 0.1);
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: 5.5rem;
+    line-height: 1;
+    pointer-events: none;
+}
+
+.condolence-entry-heading {
+    width: 100%;
+    display: flex;
+    align-items: flex-start;
+    gap: 13px;
+    margin-bottom: 18px;
+}
+
+.condolence-entry-heading .tribute-flame {
+    flex: 0 0 auto;
+    margin: 2px 0 0;
+}
+
+.condolence-entry-heading h3 {
+    margin: 0 0 4px;
+}
+
+.condolence-entry-heading time {
+    display: block;
+    margin: 0;
+    padding: 0;
+    color: #6f6a63;
+    font-size: 0.68rem;
+}
+
+.condolence-entry blockquote,
+.condolence-entry .silent-condolence {
+    position: relative;
+    z-index: 1;
+    margin: 0;
+    color: #d1cbc1;
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: 0.94rem;
+    line-height: 1.65;
+    overflow-wrap: anywhere;
+}
+
+.silent-condolence {
+    font-style: italic;
+}
+
+.entry-candle-label {
+    position: relative;
+    z-index: 1;
+    margin-top: auto;
+    padding-top: 20px;
+    color: #746f67;
+    font-size: 0.67rem;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+}
+
+.admin-intro {
+    max-width: 620px;
+    margin: 8px 0 0;
+    color: #8d8991;
+    font-size: 0.82rem;
+    line-height: 1.5;
+}
+
+.designer-credit {
+    display: block;
+    margin-top: 10px;
+    color: rgba(255, 255, 255, 0.38);
+    font-size: 0.68rem;
+    letter-spacing: 0.06em;
+}
+
+.designer-credit:hover {
+    color: var(--premium-gold);
+}
+
+@media (max-width: 760px) {
+    .condolence-actions {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .condolence-form-panel {
+        order: 1;
+    }
+
+    .support-panel {
+        order: 2;
+    }
+
+    .condolence-entries {
+        grid-template-columns: 1fr;
+    }
+
+    .condolence-entry {
+        min-height: 210px;
+    }
+
+    .book-introduction {
+        margin-top: 0;
+    }
+}
+
+@media (max-width: 480px) {
+    .condolence-form-panel,
+    .condolence-book {
+        border-radius: 22px;
+    }
+
+    .condolence-entry {
+        padding: 19px;
+    }
+
+    .condolence-entry::after {
+        font-size: 4.5rem;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .button-flame {
+        animation: none;
+    }
+}
