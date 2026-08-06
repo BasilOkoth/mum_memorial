@@ -1,5 +1,7 @@
 {% extends "base.html" %}
 
+{% block title %}Condolence Book for {{ memorial_name }}{% endblock %}
+
 {% block body %}
 <main class="memorial-page">
     {% with notices = get_flashed_messages(with_categories=true) %}
@@ -40,6 +42,7 @@
                         </svg>
                         {{ burial_date }}
                     </span>
+
                     {% if burial_venue %}
                         <span>
                             <svg viewBox="0 0 24 24" aria-hidden="true">
@@ -52,6 +55,13 @@
                 </div>
 
                 <div class="hero-actions">
+                    <a
+                        class="premium-button premium-button-gold"
+                        href="#light-candle"
+                    >
+                        Sign the condolence book
+                    </a>
+
                     {% if whatsapp_group_url %}
                         <a
                             class="premium-button premium-button-whatsapp"
@@ -66,105 +76,38 @@
                             Join family WhatsApp
                         </a>
                     {% endif %}
-
-                    <a class="premium-button premium-button-quiet" href="#support">
-                        Support the family
-                    </a>
                 </div>
 
-                <a class="candle-stat" href="#remembrance">
+                <a class="candle-stat" href="#candle-wall">
                     <span class="mini-flame" aria-hidden="true"></span>
                     <strong>{{ candle_count }}</strong>
-                    candle{% if candle_count != 1 %}s{% endif %} lit
-                    <span class="candle-stat-action">Light one</span>
+                    condolence entr{% if candle_count == 1 %}y{% else %}ies{% endif %}
+                    <span class="candle-stat-action">Read the book</span>
                 </a>
             </div>
         </div>
     </section>
 
-    <section class="premium-content" aria-label="Memorial actions">
-        <article class="premium-panel support-panel" id="support">
+    <section class="premium-content condolence-actions" aria-label="Condolence and family support">
+        <article class="premium-panel remembrance-panel condolence-form-panel" id="light-candle">
             <div class="panel-heading">
                 <div>
-                    <p class="premium-kicker">Family support</p>
-                    <h2>Contribute via M-Pesa</h2>
-                </div>
-                <span class="verified-badge">Verified details</span>
-            </div>
-
-            <p class="panel-intro">
-                Contributions are optional and will support funeral and burial arrangements.
-            </p>
-
-            <div class="premium-mpesa-card">
-                <div class="mpesa-topline">
-                    <span>M-Pesa number</span>
-                    <span class="mpesa-mark">M-PESA</span>
-                </div>
-                <strong id="mpesaNumber">{{ mpesa_number }}</strong>
-                <div class="mpesa-details">
-                    <div>
-                        <span>Recipient</span>
-                        <b>{{ mpesa_name }}</b>
-                    </div>
-                    <div>
-                        <span>Purpose</span>
-                        <b>{{ contribution_purpose }}</b>
-                    </div>
-                </div>
-            </div>
-
-            <button
-                class="premium-button premium-button-gold full-width"
-                type="button"
-                onclick="copyMpesaNumber()"
-            >
-                Copy M-Pesa number
-            </button>
-
-            <div class="support-links">
-                {% if whatsapp_group_url %}
-                    <a
-                        href="{{ whatsapp_group_url }}"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                    >
-                        Collection updates
-                    </a>
-                {% endif %}
-                {% if organizer_whatsapp_url %}
-                    <a
-                        href="{{ organizer_whatsapp_url }}"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                    >
-                        Contact organizer
-                    </a>
-                {% endif %}
-                <button type="button" onclick="shareOnWhatsApp()">
-                    Share memorial
-                </button>
-            </div>
-
-            <p class="security-note">
-                Confirm the recipient name in M-Pesa before sending. Never post a full confirmation message publicly.
-            </p>
-        </article>
-
-        <article class="premium-panel remembrance-panel" id="remembrance">
-            <div class="panel-heading">
-                <div>
-                    <p class="premium-kicker">A quiet tribute</p>
-                    <h2>Light a candle</h2>
+                    <p class="premium-kicker">Digital condolence book</p>
+                    <h2>Sign the book</h2>
                 </div>
                 <span class="candle-symbol" aria-hidden="true"></span>
             </div>
 
             <p class="panel-intro">
-                Add your name and, optionally, a short prayer or memory.
+                Share a condolence, prayer or cherished memory. When you sign,
+                a memorial candle will be lit beside your message.
             </p>
 
-            <form class="premium-form" method="post" action="{{ url_for('light_candle') }}">
+            <form
+                class="premium-form"
+                method="post"
+                action="{{ url_for('light_candle') }}"
+            >
                 <input
                     type="hidden"
                     name="_csrf_token"
@@ -182,64 +125,183 @@
                 </div>
 
                 <div class="field-group">
-                    <label for="participant_name">Your name <span>optional</span></label>
+                    <label for="participant_name">
+                        Your name <span>optional</span>
+                    </label>
                     <input
                         id="participant_name"
                         name="participant_name"
                         maxlength="80"
-                        placeholder="Anonymous"
+                        autocomplete="name"
+                        placeholder="Your name or family name"
                     >
                 </div>
 
                 <div class="field-group">
-                    <label for="message">Prayer or memory <span>optional</span></label>
+                    <label for="message">
+                        Condolence, prayer or memory
+                    </label>
                     <textarea
                         id="message"
                         name="message"
                         maxlength="280"
-                        rows="4"
-                        placeholder="Write a short tribute..."
+                        rows="5"
+                        required
+                        placeholder="Write your message to the family..."
                     ></textarea>
+                    <small class="field-help">
+                        Please keep your message respectful and within 280 characters.
+                    </small>
                 </div>
 
-                <button class="premium-button premium-button-dark full-width" type="submit">
-                    Light this candle
+                <button
+                    class="premium-button premium-button-gold full-width sign-book-button"
+                    type="submit"
+                >
+                    <span class="button-flame" aria-hidden="true"></span>
+                    Sign the book &amp; light a candle
                 </button>
             </form>
 
-            <p class="privacy-line">No phone number is collected or displayed.</p>
+            <p class="privacy-line">
+                No phone number is collected. Your name and message will appear
+                publicly in the condolence book.
+            </p>
+        </article>
+
+        <article class="premium-panel support-panel" id="support">
+            <div class="panel-heading">
+                <div>
+                    <p class="premium-kicker">Optional family support</p>
+                    <h2>Contribute via M-Pesa</h2>
+                </div>
+                <span class="verified-badge">Verified details</span>
+            </div>
+
+            <p class="panel-intro">
+                Signing the condolence book is free. Financial contributions are
+                optional and will support funeral and burial arrangements.
+            </p>
+
+            <div class="premium-mpesa-card">
+                <div class="mpesa-topline">
+                    <span>M-Pesa number</span>
+                    <span class="mpesa-mark">M-PESA</span>
+                </div>
+
+                <strong id="mpesaNumber">{{ mpesa_number }}</strong>
+
+                <div class="mpesa-details">
+                    <div>
+                        <span>Recipient</span>
+                        <b>{{ mpesa_name }}</b>
+                    </div>
+                    <div>
+                        <span>Purpose</span>
+                        <b>{{ contribution_purpose }}</b>
+                    </div>
+                </div>
+            </div>
+
+            <button
+                class="premium-button premium-button-dark full-width"
+                type="button"
+                onclick="copyMpesaNumber()"
+            >
+                Copy M-Pesa number
+            </button>
+
+            <div class="support-links">
+                {% if whatsapp_group_url %}
+                    <a
+                        href="{{ whatsapp_group_url }}"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                    >
+                        Collection updates
+                    </a>
+                {% endif %}
+
+                {% if organizer_whatsapp_url %}
+                    <a
+                        href="{{ organizer_whatsapp_url }}"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                    >
+                        Contact organizer
+                    </a>
+                {% endif %}
+
+                <button type="button" onclick="shareOnWhatsApp()">
+                    Share memorial
+                </button>
+            </div>
+
+            <p class="security-note">
+                Confirm the recipient name in M-Pesa before sending. Never post
+                a complete M-Pesa confirmation message publicly.
+            </p>
         </article>
     </section>
 
-    <section class="tribute-wall" id="candle-wall" aria-labelledby="wall-title">
+    <section
+        class="tribute-wall condolence-book"
+        id="candle-wall"
+        aria-labelledby="book-title"
+    >
         <div class="wall-heading-premium">
             <div>
-                <p class="premium-kicker">Together in remembrance</p>
-                <h2 id="wall-title">Candle wall</h2>
+                <p class="premium-kicker">Messages of love and remembrance</p>
+                <h2 id="book-title">Digital condolence book</h2>
             </div>
-            <span>{{ candle_count }} tribute{% if candle_count != 1 %}s{% endif %}</span>
+
+            <span>
+                {{ candle_count }}
+                entr{% if candle_count == 1 %}y{% else %}ies{% endif %}
+            </span>
         </div>
 
-        <div class="premium-candles">
+        <p class="book-introduction">
+            Messages shared by relatives, friends and everyone whose life was
+            touched by {{ memorial_name }}.
+        </p>
+
+        <div class="premium-candles condolence-entries">
             {% for candle in candles %}
-                <article class="premium-candle-card">
-                    <span class="tribute-flame" aria-hidden="true"></span>
-                    <h3>{{ candle.participant_name }}</h3>
+                <article class="premium-candle-card condolence-entry">
+                    <div class="condolence-entry-heading">
+                        <span class="tribute-flame" aria-hidden="true"></span>
+                        <div>
+                            <h3>{{ candle.participant_name }}</h3>
+                            <time datetime="{{ candle.created_at.isoformat() }}">
+                                Signed {{ candle.created_at.strftime("%d %b %Y") }}
+                            </time>
+                        </div>
+                    </div>
+
                     {% if candle.message %}
                         <blockquote>“{{ candle.message }}”</blockquote>
                     {% else %}
-                        <p>Lit a candle in loving memory.</p>
+                        <p class="silent-condolence">
+                            Lit a candle in loving memory.
+                        </p>
                     {% endif %}
-                    <time datetime="{{ candle.created_at.isoformat() }}">
-                        {{ candle.created_at.strftime("%d %b %Y") }}
-                    </time>
+
+                    <span class="entry-candle-label">
+                        Candle lit in remembrance
+                    </span>
                 </article>
             {% else %}
                 <div class="premium-empty-wall">
                     <span class="large-flame" aria-hidden="true"></span>
-                    <h3>Be the first light</h3>
-                    <p>Your candle will begin this wall of remembrance.</p>
-                    <a href="#remembrance">Light a candle</a>
+                    <h3>Be the first to sign</h3>
+                    <p>
+                        Your message will begin this digital book of love,
+                        comfort and remembrance.
+                    </p>
+                    <a href="#light-candle">
+                        Sign the condolence book
+                    </a>
                 </div>
             {% endfor %}
         </div>
@@ -254,8 +316,9 @@
     </footer>
 </main>
 
-<nav class="premium-mobile-bar" aria-label="Quick actions">
-    <a href="#support">Contribute</a>
+<nav class="premium-mobile-bar condolence-mobile-bar" aria-label="Quick actions">
+    <a href="#light-candle">Sign the book</a>
+
     {% if whatsapp_group_url %}
         <a
             class="mobile-whatsapp"
@@ -266,7 +329,9 @@
             Join WhatsApp
         </a>
     {% else %}
-        <a class="mobile-whatsapp" href="#remembrance">Light candle</a>
+        <a class="mobile-whatsapp" href="#candle-wall">
+            Read messages
+        </a>
     {% endif %}
 </nav>
 
@@ -292,15 +357,22 @@
         const toast = document.getElementById("copyMessage");
         toast.textContent = message;
         toast.classList.add("is-visible");
-        window.setTimeout(() => toast.classList.remove("is-visible"), 2200);
+
+        window.setTimeout(
+            () => toast.classList.remove("is-visible"),
+            2200
+        );
     }
 
     function shareOnWhatsApp() {
         const message = [
             "In loving memory of " + memorialName + ".",
-            "Join us in remembrance and support the family here:",
+            "Please sign the digital condolence book, light a memorial candle",
+            "and share a message of comfort with the family:",
             window.location.href,
-            whatsappGroupUrl ? "Family WhatsApp group: " + whatsappGroupUrl : ""
+            whatsappGroupUrl
+                ? "Family WhatsApp group: " + whatsappGroupUrl
+                : ""
         ].filter(Boolean).join(" ");
 
         window.open(
