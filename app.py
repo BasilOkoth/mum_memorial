@@ -8,7 +8,9 @@ from datetime import datetime, timedelta, timezone
 from functools import wraps
 from pathlib import Path
 from typing import Any, Callable, TypeVar
+from urllib.parse import quote
 
+from dotenv import load_dotenv
 from flask import (
     Flask,
     abort,
@@ -20,7 +22,6 @@ from flask import (
     url_for,
 )
 from flask_sqlalchemy import SQLAlchemy
-from dotenv import load_dotenv
 from sqlalchemy import Boolean, DateTime, String, Text, func, select
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 from werkzeug.middleware.proxy_fix import ProxyFix
@@ -103,13 +104,41 @@ def create_app() -> Flask:
     return application
 
 
+def safe_https_url(value: str | None) -> str:
+    """Return an external HTTPS URL or an empty string."""
+    candidate = (value or "").strip()
+    return candidate if candidate.lower().startswith("https://") else ""
+
+
+def whatsapp_phone_url(phone: str, memorial_name: str) -> str:
+    """Build a WhatsApp chat URL from a configured Kenyan phone number."""
+    digits = "".join(character for character in phone if character.isdigit())
+
+    if digits.startswith("00"):
+        digits = digits[2:]
+    elif digits.startswith("0"):
+        digits = f"254{digits[1:]}"
+
+    if len(digits) < 10:
+        return ""
+
+    message = (
+        "Hello. I would like to confirm or ask about family support for "
+        f"{memorial_name}."
+    )
+    return f"https://wa.me/{digits}?text={quote(message)}"
+
+
 def memorial_settings() -> dict[str, str]:
     """Return memorial content configured through environment variables."""
+    memorial_name = os.getenv(
+        "MEMORIAL_NAME",
+        "Our Beloved Mum",
+    ).strip()
+    organizer_phone = os.getenv("ORGANIZER_PHONE", "").strip()
+
     return {
-        "memorial_name": os.getenv(
-            "MEMORIAL_NAME",
-            "Our Beloved Mum",
-        ).strip(),
+        "memorial_name": memorial_name,
         "memorial_message": os.getenv(
             "MEMORIAL_MESSAGE",
             "Forever loved, forever remembered, forever in our hearts.",
@@ -129,7 +158,23 @@ def memorial_settings() -> dict[str, str]:
             "CONTRIBUTION_PURPOSE",
             "Burial and funeral support",
         ).strip(),
-        "organizer_phone": os.getenv("ORGANIZER_PHONE", "").strip(),
+        "organizer_phone": organizer_phone,
+        "organizer_whatsapp_url": whatsapp_phone_url(
+            organizer_phone,
+            memorial_name,
+        ),
+        "whatsapp_group_name": os.getenv(
+            "WHATSAPP_GROUP_NAME",
+            "Family Burial Contribution Group",
+        ).strip(),
+        "whatsapp_group_url": safe_https_url(
+            os.getenv("WHATSAPP_GROUP_URL", "")
+        ),
+        "family_update": os.getenv(
+            "FAMILY_UPDATE",
+            "Join the official WhatsApp group for contribution updates, "
+            "transport coordination and family announcements.",
+        ).strip(),
     }
 
 
