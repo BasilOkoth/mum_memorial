@@ -8,12 +8,16 @@
     >
     <meta
         name="description"
-        content="A virtual memorial candle page for {{ memorial_name }}."
+        content="A memorial, candle-lighting and family support page for {{ memorial_name }}."
     >
     <title>{% block title %}A Light for {{ memorial_name }}{% endblock %}</title>
     <link
         rel="stylesheet"
         href="{{ url_for('static', filename='styles.css') }}"
+    >
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='whatsapp-support.css') }}"
     >
 </head>
 <body>
