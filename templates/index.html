@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 
 {% block body %}
-<main class="page-shell">
+<main class="page-shell has-mobile-actions">
     {% with notices = get_flashed_messages(with_categories=true) %}
         {% if notices %}
             <div class="notices" aria-live="polite">
@@ -43,9 +43,109 @@
                 candle{% if candle_count != 1 %}s{% endif %} lit
             </div>
 
-            <a class="primary-link" href="#light-candle">
-                Light a Candle
+            <div class="hero-actions">
+                {% if whatsapp_group_url %}
+                    <a
+                        class="whatsapp-primary-link"
+                        href="{{ whatsapp_group_url }}"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                    >
+                        <span aria-hidden="true">💬</span>
+                        Join Contribution Group
+                    </a>
+                {% endif %}
+
+                <a class="primary-link hero-candle-link" href="#light-candle">
+                    Light a Candle
+                </a>
+            </div>
+        </div>
+    </section>
+
+    {% if whatsapp_group_url %}
+        <section class="card whatsapp-hub" id="family-group">
+            <div class="whatsapp-hub-copy">
+                <p class="section-kicker">Official family coordination</p>
+                <h2>Join the WhatsApp Support Group</h2>
+                <p class="muted">
+                    {{ family_update }}
+                </p>
+
+                <div class="group-name-badge">
+                    <span aria-hidden="true">💬</span>
+                    {{ whatsapp_group_name }}
+                </div>
+            </div>
+
+            <div class="whatsapp-hub-actions">
+                <a
+                    class="whatsapp-button link-button"
+                    href="{{ whatsapp_group_url }}"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                >
+                    Join WhatsApp Group
+                </a>
+                <button
+                    class="secondary-button"
+                    type="button"
+                    onclick="copyGroupLink()"
+                >
+                    Copy Group Link
+                </button>
+            </div>
+        </section>
+    {% endif %}
+
+    <section class="support-options" aria-labelledby="support-options-title">
+        <div class="support-options-heading">
+            <p class="section-kicker">Stand with the family</p>
+            <h2 id="support-options-title">Ways to Participate</h2>
+            <p class="muted">
+                Every form of support matters. Choose the option that is
+                appropriate for you.
+            </p>
+        </div>
+
+        <div class="support-option-grid">
+            {% if whatsapp_group_url %}
+                <a
+                    class="support-option"
+                    href="{{ whatsapp_group_url }}"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                >
+                    <span class="support-icon" aria-hidden="true">💬</span>
+                    <strong>Join the group</strong>
+                    <span>Receive official updates and coordinate support.</span>
+                </a>
+            {% endif %}
+
+            <a class="support-option" href="#contribute">
+                <span class="support-icon" aria-hidden="true">🤍</span>
+                <strong>Contribute</strong>
+                <span>Use the verified family M-Pesa details below.</span>
             </a>
+
+            <a class="support-option" href="#light-candle">
+                <span class="support-icon" aria-hidden="true">🕯️</span>
+                <strong>Share a tribute</strong>
+                <span>Light a free candle and leave a prayer or memory.</span>
+            </a>
+
+            {% if organizer_whatsapp_url %}
+                <a
+                    class="support-option"
+                    href="{{ organizer_whatsapp_url }}"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                >
+                    <span class="support-icon" aria-hidden="true">🤝</span>
+                    <strong>Offer practical help</strong>
+                    <span>Ask about transport, food, logistics or other needs.</span>
+                </a>
+            {% endif %}
         </div>
     </section>
 
@@ -108,7 +208,7 @@
             </p>
         </article>
 
-        <article class="card support-card">
+        <article class="card support-card" id="contribute">
             <p class="section-kicker">Optional family support</p>
             <h2>🤍 Burial Contribution</h2>
             <p class="muted">
@@ -147,17 +247,40 @@
                 Copy M-Pesa Number
             </button>
 
+            {% if whatsapp_group_url %}
+                <a
+                    class="whatsapp-button link-button"
+                    href="{{ whatsapp_group_url }}"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                >
+                    Join Group for Collection Updates
+                </a>
+            {% endif %}
+
+            {% if organizer_whatsapp_url %}
+                <a
+                    class="organizer-link"
+                    href="{{ organizer_whatsapp_url }}"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                >
+                    Message the family organizer
+                </a>
+            {% endif %}
+
             <button
-                class="whatsapp-button"
+                class="share-button"
                 type="button"
                 onclick="shareOnWhatsApp()"
             >
-                Share on WhatsApp
+                Share Memorial on WhatsApp
             </button>
 
             <p class="privacy-note">
-                Please verify the recipient's name before completing an
-                M-Pesa transaction.
+                Verify the recipient's name before completing an M-Pesa
+                transaction. Do not post your full M-Pesa confirmation message
+                publicly.
             </p>
         </article>
     </section>
@@ -215,21 +338,60 @@
     </footer>
 </main>
 
+{% if whatsapp_group_url %}
+    <nav class="mobile-action-bar" aria-label="Memorial quick actions">
+        <a href="#light-candle">
+            <span aria-hidden="true">🕯️</span>
+            Light Candle
+        </a>
+        <a
+            class="mobile-whatsapp-action"
+            href="{{ whatsapp_group_url }}"
+            target="_blank"
+            rel="noopener noreferrer"
+        >
+            <span aria-hidden="true">💬</span>
+            Join Group
+        </a>
+    </nav>
+{% endif %}
+
 <div id="copyMessage" class="copy-message" role="status" aria-live="polite">
-    M-Pesa number copied
+    Copied
 </div>
 
 <script>
     const memorialName = {{ memorial_name|tojson }};
     const mpesaNumber = {{ mpesa_number|tojson }};
+    const whatsappGroupUrl = {{ whatsapp_group_url|tojson }};
 
-    async function copyMpesaNumber() {
+    async function copyText(value, successMessage, fallbackPrompt) {
         try {
-            await navigator.clipboard.writeText(mpesaNumber);
-            showCopyMessage("M-Pesa number copied");
+            await navigator.clipboard.writeText(value);
+            showCopyMessage(successMessage);
         } catch (error) {
-            window.prompt("Copy the M-Pesa number:", mpesaNumber);
+            window.prompt(fallbackPrompt, value);
         }
+    }
+
+    function copyMpesaNumber() {
+        copyText(
+            mpesaNumber,
+            "M-Pesa number copied",
+            "Copy the M-Pesa number:"
+        );
+    }
+
+    function copyGroupLink() {
+        if (!whatsappGroupUrl) {
+            return;
+        }
+
+        copyText(
+            whatsappGroupUrl,
+            "WhatsApp group link copied",
+            "Copy the WhatsApp group link:"
+        );
     }
 
     function showCopyMessage(message) {
@@ -243,16 +405,22 @@
     }
 
     function shareOnWhatsApp() {
-        const message = [
-            "Please join us in lighting a virtual candle in memory of",
-            memorialName + ".",
-            "Lighting a candle is free.",
-            "Burial support through the family's M-Pesa details is optional.",
+        const messageParts = [
+            "Please join us in remembering " + memorialName + ".",
+            "You may light a free virtual candle, share a tribute, or support",
+            "the family through the verified details on this memorial page.",
             window.location.href
-        ].join(" ");
+        ];
+
+        if (whatsappGroupUrl) {
+            messageParts.push(
+                "Official family WhatsApp group: " + whatsappGroupUrl
+            );
+        }
 
         const whatsappUrl =
-            "https://wa.me/?text=" + encodeURIComponent(message);
+            "https://wa.me/?text=" +
+            encodeURIComponent(messageParts.join(" "));
 
         window.open(whatsappUrl, "_blank", "noopener,noreferrer");
     }
