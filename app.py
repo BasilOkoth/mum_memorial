@@ -170,7 +170,11 @@ def memorial_settings() -> dict[str, Any]:
     organizer_phone = os.getenv("ORGANIZER_PHONE", "").strip()
 
     livestream_url = safe_https_url(os.getenv("LIVESTREAM_URL", ""))
-    old_video_url = safe_https_url(os.getenv("OLD_VIDEO_URL", ""))
+    video_memories = [
+        item.strip()
+        for item in os.getenv("VIDEO_MEMORIES", "").split(",")
+        if safe_https_url(item.strip())
+    ]
 
     gallery_folder = Path(application_static_folder()) / "gallery"
     allowed_extensions = {".jpg", ".jpeg", ".png", ".webp"}
@@ -231,8 +235,10 @@ def memorial_settings() -> dict[str, Any]:
         ).strip(),
         "livestream_url": livestream_url,
         "livestream_embed_url": video_embed_url(livestream_url),
-        "old_video_url": old_video_url,
-        "old_video_embed_url": video_embed_url(old_video_url),
+        "video_memories": [
+            {"url": video_url, "embed_url": video_embed_url(video_url)}
+            for video_url in video_memories
+        ],
         "eulogy_filename": os.getenv(
             "EULOGY_FILENAME",
             "eulogy.pdf",
