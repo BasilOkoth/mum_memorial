@@ -18,6 +18,7 @@ from flask import (
     redirect,
     render_template,
     request,
+    send_from_directory,
     session,
     url_for,
 )
@@ -39,7 +40,7 @@ ViewFunction = TypeVar("ViewFunction", bound=Callable[..., Any])
 
 
 class Candle(db.Model):
-    """A virtual candle and optional tribute message."""
+    """A virtual candle and tribute/condolence message."""
 
     id: Mapped[int] = mapped_column(primary_key=True)
     participant_name: Mapped[str] = mapped_column(String(80), nullable=False)
@@ -105,13 +106,11 @@ def create_app() -> Flask:
 
 
 def safe_https_url(value: str | None) -> str:
-    """Return an external HTTPS URL or an empty string."""
     candidate = (value or "").strip()
     return candidate if candidate.lower().startswith("https://") else ""
 
 
 def whatsapp_phone_url(phone: str, memorial_name: str) -> str:
-    """Build a WhatsApp chat URL from a configured Kenyan phone number."""
     digits = "".join(character for character in phone if character.isdigit())
 
     if digits.startswith("00"):
@@ -129,13 +128,22 @@ def whatsapp_phone_url(phone: str, memorial_name: str) -> str:
     return f"https://wa.me/{digits}?text={quote(message)}"
 
 
-def memorial_settings() -> dict[str, str]:
-    """Return memorial content configured through environment variables."""
+def memorial_settings() -> dict[str, Any]:
     memorial_name = os.getenv(
         "MEMORIAL_NAME",
         "Our Beloved Mum",
     ).strip()
+
     organizer_phone = os.getenv("ORGANIZER_PHONE", "").strip()
+
+    gallery_photos = [
+        item.strip()
+        for item in os.getenv(
+            "GALLERY_PHOTOS",
+            "/static/mum.jpg",
+        ).split(",")
+        if item.strip()
+    ]
 
     return {
         "memorial_name": memorial_name,
@@ -175,12 +183,15 @@ def memorial_settings() -> dict[str, str]:
             "Join the official WhatsApp group for contribution updates, "
             "transport coordination and family announcements.",
         ).strip(),
+        "eulogy_filename": os.getenv(
+            "EULOGY_FILENAME",
+            "eulogy.pdf",
+        ).strip(),
+        "gallery_photos": gallery_photos,
     }
 
 
 def register_template_helpers(application: Flask) -> None:
-    """Register helpers used by templates."""
-
     @application.context_processor
     def inject_common_values() -> dict[str, Any]:
         return {
@@ -191,7 +202,6 @@ def register_template_helpers(application: Flask) -> None:
 
 
 def csrf_token() -> str:
-    """Return a stable CSRF token for the current browser session."""
     token = session.get("_csrf_token")
 
     if not token:
@@ -202,7 +212,6 @@ def csrf_token() -> str:
 
 
 def validate_csrf() -> None:
-    """Reject missing or invalid CSRF tokens."""
     expected = session.get("_csrf_token", "")
     supplied = request.form.get("_csrf_token", "")
 
@@ -211,7 +220,6 @@ def validate_csrf() -> None:
 
 
 def client_ip_hash() -> str:
-    """Create a non-reversible identifier for anti-spam throttling."""
     client_ip = request.remote_addr or "unknown"
     secret = str(app.config["SECRET_KEY"]).encode("utf-8")
 
@@ -223,12 +231,10 @@ def client_ip_hash() -> str:
 
 
 def normalize_text(value: str | None, maximum_length: int) -> str:
-    """Normalize user text and enforce a maximum length."""
     return " ".join((value or "").split())[:maximum_length]
 
 
 def candle_rate_limited(ip_hash: str) -> bool:
-    """Allow one candle per visitor during the configured cooldown."""
     cooldown_seconds = max(
         5,
         int(os.getenv("CANDLE_COOLDOWN_SECONDS", "30")),
@@ -248,21 +254,16 @@ def candle_rate_limited(ip_hash: str) -> bool:
 
 
 def admin_required(view: ViewFunction) -> ViewFunction:
-    """Require an authenticated memorial moderator."""
-
     @wraps(view)
     def wrapped(*args: Any, **kwargs: Any) -> Any:
         if not session.get("memorial_admin"):
             return redirect(url_for("admin_login", next=request.path))
-
         return view(*args, **kwargs)
 
     return wrapped  # type: ignore[return-value]
 
 
 def register_routes(application: Flask) -> None:
-    """Register public and moderation routes."""
-
     @application.get("/")
     def memorial_page() -> str:
         candles = db.session.scalars(
@@ -284,11 +285,15 @@ def register_routes(application: Flask) -> None:
             filename="mum-placeholder.svg",
         )
 
+        eulogy_path = Path(application.static_folder or "static") / settings["eulogy_filename"]
+        eulogy_available = eulogy_path.exists()
+
         return render_template(
             "index.html",
             candles=candles,
             candle_count=candle_count,
             photo_url=photo_url,
+            eulogy_available=eulogy_available,
         )
 
     @application.post("/light-candle")
@@ -302,7 +307,10 @@ def register_routes(application: Flask) -> None:
             request.form.get("participant_name"),
             80,
         )
-        message = normalize_text(request.form.get("message"), 280)
+        message = normalize_text(
+            request.form.get("message"),
+            600,
+        )
 
         if not participant_name:
             participant_name = "Anonymous"
@@ -311,8 +319,7 @@ def register_routes(application: Flask) -> None:
 
         if candle_rate_limited(ip_hash):
             flash(
-                "Your previous candle was received. "
-                "Please wait before lighting another.",
+                "Your previous entry was received. Please wait before submitting another.",
                 "warning",
             )
             return redirect(url_for("memorial_page") + "#light-candle")
@@ -326,11 +333,39 @@ def register_routes(application: Flask) -> None:
         db.session.commit()
 
         flash(
-            "Your candle is now shining in loving memory. "
-            "Thank you for participating.",
+            "Your tribute has been added and a memorial candle is now shining beside it.",
             "success",
         )
         return redirect(url_for("memorial_page") + "#candle-wall")
+
+    @application.get("/eulogy")
+    def read_eulogy() -> Any:
+        settings = memorial_settings()
+        eulogy_path = Path(application.static_folder or "static") / settings["eulogy_filename"]
+
+        if not eulogy_path.exists():
+            abort(404, description="The eulogy has not yet been uploaded.")
+
+        return send_from_directory(
+            application.static_folder,
+            settings["eulogy_filename"],
+            as_attachment=False,
+        )
+
+    @application.get("/eulogy/download")
+    def download_eulogy() -> Any:
+        settings = memorial_settings()
+        eulogy_path = Path(application.static_folder or "static") / settings["eulogy_filename"]
+
+        if not eulogy_path.exists():
+            abort(404, description="The eulogy has not yet been uploaded.")
+
+        return send_from_directory(
+            application.static_folder,
+            settings["eulogy_filename"],
+            as_attachment=True,
+            download_name=f"{settings['memorial_name']} - Eulogy.pdf",
+        )
 
     @application.route("/admin/login", methods=["GET", "POST"])
     def admin_login() -> Any:
@@ -376,7 +411,7 @@ def register_routes(application: Flask) -> None:
         candle.is_visible = not candle.is_visible
         db.session.commit()
 
-        flash("Candle visibility updated.", "success")
+        flash("Entry visibility updated.", "success")
         return redirect(url_for("admin_dashboard"))
 
     @application.post("/admin/candles/<int:candle_id>/delete")
@@ -387,7 +422,7 @@ def register_routes(application: Flask) -> None:
         db.session.delete(candle)
         db.session.commit()
 
-        flash("Candle deleted.", "success")
+        flash("Entry deleted.", "success")
         return redirect(url_for("admin_dashboard"))
 
     @application.post("/admin/logout")
@@ -414,7 +449,7 @@ def register_routes(application: Flask) -> None:
         return render_template(
             "error.html",
             title="Page not found",
-            message="The requested page does not exist.",
+            message=str(error),
         ), 404
 
     @application.errorhandler(500)
