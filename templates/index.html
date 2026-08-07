@@ -150,7 +150,7 @@
     </section>
 
 
-    {% if livestream_url or old_video_url %}
+    {% if livestream_url or video_memories %}
     <section class="premium-content media-section" id="media" aria-label="Memorial videos">
         <div class="media-section-heading">
             <p class="premium-kicker">Watch and remember</p>
@@ -192,20 +192,20 @@
             </article>
             {% endif %}
 
-            {% if old_video_url %}
+            {% for video in video_memories %}
             <article class="premium-panel media-card">
                 <div class="media-card-heading">
                     <div>
                         <p class="premium-kicker">Treasured moments</p>
-                        <h3>Video Memories</h3>
+                        <h3>Video Memory {{ loop.index }}</h3>
                     </div>
                 </div>
 
-                {% if old_video_embed_url %}
+                {% if video.embed_url %}
                     <div class="video-frame">
                         <iframe
-                            src="{{ old_video_embed_url }}"
-                            title="Video memory of {{ memorial_name }}"
+                            src="{{ video.embed_url }}"
+                            title="Video memory {{ loop.index }} of {{ memorial_name }}"
                             loading="lazy"
                             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
                             allowfullscreen
@@ -213,12 +213,14 @@
                     </div>
                 {% else %}
                     <a class="premium-button premium-button-dark"
-                       href="{{ old_video_url }}"
+                       href="{{ video.url }}"
                        target="_blank"
                        rel="noopener noreferrer">
                         Watch Video Memory
                     </a>
                 {% endif %}
+            </article>
+            {% endfor %}
             </article>
             {% endif %}
         </div>
