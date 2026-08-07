@@ -59,7 +59,7 @@ services:
       - key: LIVESTREAM_URL
         sync: false
 
-      - key: OLD_VIDEO_URL
+      - key: VIDEO_MEMORIES
         value: "https://www.youtube.com/watch?v=r_3_HGehp30&t=1482s"
 
     disk:
