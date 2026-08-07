@@ -44,7 +44,8 @@ key: WHATSAPP_GROUP_URL
 value: https://chat.whatsapp.com/Ld8zx7Bey5w5QdR2jOP3bn
 key: FAMILY_UPDATE
 value: Join the official WhatsApp group for contribution updates, transport coordination and family announcements.
-
+LIVESTREAM_URL=
+OLD_VIDEO_URL=
 disk:
 name: memorial-data
 mountPath: /var/data
