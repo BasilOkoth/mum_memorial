@@ -288,12 +288,15 @@ def register_routes(application: Flask) -> None:
         eulogy_path = Path(application.static_folder or "static") / settings["eulogy_filename"]
         eulogy_available = eulogy_path.exists()
 
+        owned_candle_ids = set(session.get("owned_candles", []))
+
         return render_template(
             "index.html",
             candles=candles,
             candle_count=candle_count,
             photo_url=photo_url,
             eulogy_available=eulogy_available,
+            owned_candle_ids=owned_candle_ids,
         )
 
     @application.post("/light-candle")
@@ -332,11 +335,17 @@ def register_routes(application: Flask) -> None:
         db.session.add(candle)
         db.session.commit()
 
+        owned_candles = session.get("owned_candles", [])
+        if candle.id not in owned_candles:
+            owned_candles.append(candle.id)
+        session["owned_candles"] = owned_candles[-50:]
+        session.modified = True
+
         flash(
             "Your tribute has been added and a memorial candle is now shining beside it.",
             "success",
         )
-        return redirect(url_for("memorial_page") + "#candle-wall")
+        return redirect(url_for("memorial_page") + f"#tribute-{candle.id}")
 
     @application.get("/eulogy")
     def read_eulogy() -> Any:
@@ -366,6 +375,42 @@ def register_routes(application: Flask) -> None:
             as_attachment=True,
             download_name=f"{settings['memorial_name']} - Eulogy.pdf",
         )
+
+    @application.post("/tributes/<int:candle_id>/edit")
+    def edit_own_tribute(candle_id: int) -> Any:
+        validate_csrf()
+
+        owned_candle_ids = set(session.get("owned_candles", []))
+        if candle_id not in owned_candle_ids:
+            abort(
+                403,
+                description="You can only edit tributes submitted from this browser.",
+            )
+
+        candle = db.get_or_404(Candle, candle_id)
+
+        participant_name = normalize_text(
+            request.form.get("participant_name"),
+            80,
+        )
+        message = normalize_text(
+            request.form.get("message"),
+            600,
+        )
+
+        if not participant_name:
+            participant_name = "Anonymous"
+
+        if not message:
+            flash("Please enter a tribute before saving.", "warning")
+            return redirect(url_for("memorial_page") + f"#tribute-{candle_id}")
+
+        candle.participant_name = participant_name
+        candle.message = message
+        db.session.commit()
+
+        flash("Your tribute has been updated.", "success")
+        return redirect(url_for("memorial_page") + f"#tribute-{candle_id}")
 
     @application.route("/admin/login", methods=["GET", "POST"])
     def admin_login() -> Any:
@@ -414,6 +459,35 @@ def register_routes(application: Flask) -> None:
         flash("Entry visibility updated.", "success")
         return redirect(url_for("admin_dashboard"))
 
+    @application.post("/admin/candles/<int:candle_id>/edit")
+    @admin_required
+    def edit_candle(candle_id: int) -> Any:
+        validate_csrf()
+        candle = db.get_or_404(Candle, candle_id)
+
+        participant_name = normalize_text(
+            request.form.get("participant_name"),
+            80,
+        )
+        message = normalize_text(
+            request.form.get("message"),
+            600,
+        )
+
+        if not participant_name:
+            participant_name = "Anonymous"
+
+        if not message:
+            flash("A tribute message is required.", "warning")
+            return redirect(url_for("admin_dashboard") + f"#entry-{candle_id}")
+
+        candle.participant_name = participant_name
+        candle.message = message
+        db.session.commit()
+
+        flash("Tribute updated successfully.", "success")
+        return redirect(url_for("admin_dashboard") + f"#entry-{candle_id}")
+
     @application.post("/admin/candles/<int:candle_id>/delete")
     @admin_required
     def delete_candle(candle_id: int) -> Any:
@@ -443,6 +517,14 @@ def register_routes(application: Flask) -> None:
             title="Request could not be completed",
             message=str(error),
         ), 400
+
+    @application.errorhandler(403)
+    def forbidden(error: Exception) -> tuple[str, int]:
+        return render_template(
+            "error.html",
+            title="Editing not available",
+            message=str(error),
+        ), 403
 
     @application.errorhandler(404)
     def not_found(error: Exception) -> tuple[str, int]:
