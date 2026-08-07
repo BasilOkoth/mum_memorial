@@ -1,33 +1,508 @@
+{% extends "base.html" %}
 
-/* Contributor self-editing */
-.tribute-owner-edit {
-    margin-top: 16px;
-    padding-top: 14px;
-    border-top: 1px solid rgba(255,255,255,.08);
-}
+{% block title %}Memorial for {{ memorial_name }}{% endblock %}
 
-.tribute-edit-link {
-    cursor: pointer;
-    display: inline-flex;
-    align-items: center;
-    font-weight: 700;
-    font-size: .92rem;
-    text-decoration: underline;
-    text-underline-offset: 3px;
-}
+{% block body %}
+<main class="memorial-page">
+    {% with notices = get_flashed_messages(with_categories=true) %}
+        {% if notices %}
+            <div class="premium-notices" aria-live="polite">
+                {% for category, notice in notices %}
+                    <div class="premium-notice premium-notice-{{ category }}">
+                        {{ notice }}
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+    {% endwith %}
 
-.tribute-owner-edit summary {
-    list-style: none;
-}
+    <section class="premium-hero" aria-labelledby="memorial-title">
+        <div class="hero-glow hero-glow-one" aria-hidden="true"></div>
+        <div class="hero-glow hero-glow-two" aria-hidden="true"></div>
 
-.tribute-owner-edit summary::-webkit-details-marker {
-    display: none;
-}
+        <div class="premium-hero-inner">
+            <div class="portrait-wrap">
+                <img
+                    class="premium-portrait"
+                    src="{{ photo_url }}"
+                    alt="Portrait of {{ memorial_name }}"
+                >
+                <span class="portrait-ring" aria-hidden="true"></span>
+            </div>
 
-.tribute-owner-edit-form {
-    margin-top: 14px;
-}
+            <div class="hero-copy">
+                <p class="premium-eyebrow">In loving memory</p>
+                <h1 id="memorial-title">{{ memorial_name }}</h1>
+                <p class="premium-message">{{ memorial_message }}</p>
 
-.tribute-owner-edit-form .premium-button {
-    margin-top: 4px;
-}
+                <div class="service-meta" aria-label="Burial details">
+                    <span>{{ burial_date }}</span>
+                    {% if burial_venue %}
+                        <span>{{ burial_venue }}</span>
+                    {% endif %}
+                </div>
+
+                <div class="hero-actions">
+                    <a
+                        class="premium-button premium-button-gold"
+                        href="#light-candle"
+                    >
+                        Leave a tribute
+                    </a>
+
+                    {% if eulogy_available %}
+                        <a
+                            class="premium-button premium-button-dark"
+                            href="{{ url_for('read_eulogy') }}"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                        >
+                            Read Eulogy
+                        </a>
+                    {% endif %}
+
+                    {% if whatsapp_group_url %}
+                        <a
+                            class="premium-button premium-button-whatsapp"
+                            href="{{ whatsapp_group_url }}"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                        >
+                            Join family WhatsApp
+                        </a>
+                    {% endif %}
+                </div>
+
+                <a class="candle-stat" href="#candle-wall">
+                    <strong>{{ candle_count }}</strong>
+                    tribute{% if candle_count != 1 %}s{% endif %}
+                    <span class="candle-stat-action">Read messages</span>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <section class="premium-content story-panel-grid" aria-label="Memorial keepsakes">
+        <article class="premium-panel">
+            <p class="premium-kicker">Her life in pictures</p>
+            <h2>Photo Memories</h2>
+            <p class="panel-intro">
+                A collection of moments we shared with Mum — family gatherings,
+                celebrations and everyday memories that remain with us.
+            </p>
+
+            <div class="memorial-gallery">
+                {% for image in gallery_photos %}
+                    <a
+                        href="{{ image }}"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        class="gallery-item"
+                    >
+                        <img
+                            src="{{ image }}"
+                            alt="Memory of {{ memorial_name }}"
+                            loading="lazy"
+                        >
+                    </a>
+                {% endfor %}
+            </div>
+        </article>
+
+        <article class="premium-panel eulogy-panel">
+            <p class="premium-kicker">Her story and legacy</p>
+            <h2>Mum's Eulogy</h2>
+            <p class="panel-intro">
+                Read the story of her life, the people she loved, the values she carried
+                and the legacy she leaves with us.
+            </p>
+
+            {% if eulogy_available %}
+                <div class="eulogy-actions">
+                    <a
+                        class="premium-button premium-button-dark"
+                        href="{{ url_for('read_eulogy') }}"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                    >
+                        Read Eulogy
+                    </a>
+
+                    <a
+                        class="premium-button premium-button-gold"
+                        href="{{ url_for('download_eulogy') }}"
+                    >
+                        Download PDF
+                    </a>
+                </div>
+            {% else %}
+                <p class="soft-note">
+                    The eulogy will be available here once the final PDF is uploaded.
+                </p>
+            {% endif %}
+        </article>
+    </section>
+
+    <section
+        class="premium-content condolence-actions"
+        aria-label="Tributes and family support"
+    >
+        <article
+            class="premium-panel remembrance-panel condolence-form-panel"
+            id="light-candle"
+        >
+            <div class="panel-heading">
+                <div>
+                    <p class="premium-kicker">Digital condolence book</p>
+                    <h2>Leave a tribute</h2>
+                </div>
+                <span class="candle-symbol" aria-hidden="true"></span>
+            </div>
+
+            <p class="panel-intro">
+                Share a condolence, prayer, tribute or cherished memory of Mum.
+                You may write a message to the family, recall a moment you shared
+                with her, something she taught you, or simply leave words of love
+                and remembrance.
+            </p>
+
+            <form
+                class="premium-form"
+                method="post"
+                action="{{ url_for('light_candle') }}"
+            >
+                <input
+                    type="hidden"
+                    name="_csrf_token"
+                    value="{{ csrf_token() }}"
+                >
+
+                <div class="honeypot" aria-hidden="true">
+                    <label for="website">Website</label>
+                    <input
+                        id="website"
+                        name="website"
+                        tabindex="-1"
+                        autocomplete="off"
+                    >
+                </div>
+
+                <div class="field-group">
+                    <label for="participant_name">
+                        Your name <span>optional</span>
+                    </label>
+
+                    <input
+                        id="participant_name"
+                        name="participant_name"
+                        maxlength="80"
+                        autocomplete="name"
+                        placeholder="Your name or family name"
+                    >
+                </div>
+
+                <div class="field-group">
+                    <label for="message">
+                        Condolence, tribute or memory
+                    </label>
+
+                    <textarea
+                        id="message"
+                        name="message"
+                        maxlength="600"
+                        rows="7"
+                        required
+                        placeholder="Share your condolence, prayer, tribute or memory..."
+                    ></textarea>
+
+                    <small class="field-help">
+                        You may write up to 600 characters.
+                    </small>
+                </div>
+
+                <button
+                    class="premium-button premium-button-gold full-width sign-book-button"
+                    type="submit"
+                >
+                    Sign the book &amp; light a candle
+                </button>
+            </form>
+
+            <p class="privacy-line">
+                No phone number is collected. Your name and message will appear
+                publicly in the memorial book.
+            </p>
+        </article>
+
+        <article class="premium-panel support-panel" id="support">
+            <div class="panel-heading">
+                <div>
+                    <p class="premium-kicker">Optional family support</p>
+                    <h2>Contribute via M-Pesa</h2>
+                </div>
+                <span class="verified-badge">Verified details</span>
+            </div>
+
+            <p class="panel-intro">
+                Signing the memorial book is free. Financial contributions are
+                optional and support funeral and burial arrangements.
+            </p>
+
+            <div class="premium-mpesa-card">
+                <div class="mpesa-topline">
+                    <span>M-Pesa number</span>
+                    <span class="mpesa-mark">M-PESA</span>
+                </div>
+
+                <strong id="mpesaNumber">{{ mpesa_number }}</strong>
+
+                <div class="mpesa-details">
+                    <div>
+                        <span>Recipient</span>
+                        <b>{{ mpesa_name }}</b>
+                    </div>
+
+                    <div>
+                        <span>Purpose</span>
+                        <b>{{ contribution_purpose }}</b>
+                    </div>
+                </div>
+            </div>
+
+            <button
+                class="premium-button premium-button-dark full-width"
+                type="button"
+                onclick="copyMpesaNumber()"
+            >
+                Copy M-Pesa number
+            </button>
+
+            <div class="support-links">
+                {% if whatsapp_group_url %}
+                    <a
+                        href="{{ whatsapp_group_url }}"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                    >
+                        Collection updates
+                    </a>
+                {% endif %}
+
+                {% if organizer_whatsapp_url %}
+                    <a
+                        href="{{ organizer_whatsapp_url }}"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                    >
+                        Contact organizer
+                    </a>
+                {% endif %}
+
+                <button type="button" onclick="shareOnWhatsApp()">
+                    Share memorial
+                </button>
+            </div>
+        </article>
+    </section>
+
+    <section
+        class="tribute-wall condolence-book"
+        id="candle-wall"
+        aria-labelledby="book-title"
+    >
+        <div class="wall-heading-premium">
+            <div>
+                <p class="premium-kicker">Messages, prayers and cherished memories</p>
+                <h2 id="book-title">Memorial &amp; Condolence Wall</h2>
+            </div>
+
+            <span>
+                {{ candle_count }}
+                entr{% if candle_count == 1 %}y{% else %}ies{% endif %}
+            </span>
+        </div>
+
+        <p class="book-introduction">
+            Condolences, tributes and memories shared by relatives, friends and
+            everyone whose life was touched by {{ memorial_name }}.
+        </p>
+
+        <div class="premium-candles condolence-entries">
+            {% for candle in candles %}
+                <article class="premium-candle-card condolence-entry" id="tribute-{{ candle.id }}">
+                    <div class="condolence-entry-heading">
+                        <span class="tribute-flame" aria-hidden="true"></span>
+
+                        <div>
+                            <h3>{{ candle.participant_name }}</h3>
+
+                            <time datetime="{{ candle.created_at.isoformat() }}">
+                                Shared {{ candle.created_at.strftime("%d %b %Y") }}
+                            </time>
+                        </div>
+                    </div>
+
+                    {% if candle.message %}
+                        <blockquote>“{{ candle.message }}”</blockquote>
+                    {% else %}
+                        <p class="silent-condolence">
+                            Lit a candle in loving memory.
+                        </p>
+                    {% endif %}
+
+                    <span class="entry-candle-label">
+                        Candle lit in remembrance
+                    </span>
+
+                    {% if candle.id in owned_candle_ids %}
+                        <details class="tribute-owner-edit">
+                            <summary class="tribute-edit-link">
+                                Edit my tribute
+                            </summary>
+
+                            <form
+                                class="premium-form tribute-owner-edit-form"
+                                method="post"
+                                action="{{ url_for('edit_own_tribute', candle_id=candle.id) }}"
+                            >
+                                <input
+                                    type="hidden"
+                                    name="_csrf_token"
+                                    value="{{ csrf_token() }}"
+                                >
+
+                                <div class="field-group">
+                                    <label for="public-name-{{ candle.id }}">
+                                        Your name
+                                    </label>
+                                    <input
+                                        id="public-name-{{ candle.id }}"
+                                        name="participant_name"
+                                        maxlength="80"
+                                        value="{{ candle.participant_name }}"
+                                    >
+                                </div>
+
+                                <div class="field-group">
+                                    <label for="public-message-{{ candle.id }}">
+                                        Your tribute
+                                    </label>
+                                    <textarea
+                                        id="public-message-{{ candle.id }}"
+                                        name="message"
+                                        maxlength="600"
+                                        rows="6"
+                                        required
+                                    >{{ candle.message }}</textarea>
+                                </div>
+
+                                <button
+                                    class="premium-button premium-button-dark"
+                                    type="submit"
+                                >
+                                    Save Changes
+                                </button>
+                            </form>
+                        </details>
+                    {% endif %}
+                </article>
+            {% else %}
+                <div class="premium-empty-wall">
+                    <span class="large-flame" aria-hidden="true"></span>
+
+                    <h3>Be the first to leave a tribute</h3>
+
+                    <p>
+                        Your words will begin this digital book of love,
+                        memories, comfort and remembrance.
+                    </p>
+
+                    <a href="#light-candle">
+                        Leave a tribute
+                    </a>
+                </div>
+            {% endfor %}
+        </div>
+    </section>
+
+    <footer class="premium-footer">
+        <p>Forever remembered. Forever loved.</p>
+        <span>{{ memorial_name }} · {{ current_year }}</span>
+
+        <small class="designer-credit">
+            Designed with care by Barsil Chrysler
+        </small>
+    </footer>
+</main>
+
+<nav
+    class="premium-mobile-bar condolence-mobile-bar"
+    aria-label="Quick actions"
+>
+    <a href="#light-candle">Leave tribute</a>
+
+    {% if eulogy_available %}
+        <a
+            href="{{ url_for('read_eulogy') }}"
+            target="_blank"
+            rel="noopener noreferrer"
+        >
+            Eulogy
+        </a>
+    {% endif %}
+
+    <a href="#candle-wall">Read messages</a>
+</nav>
+
+<div
+    id="copyMessage"
+    class="premium-toast"
+    role="status"
+    aria-live="polite"
+>
+    Copied
+</div>
+
+<script>
+    const memorialName = {{ memorial_name|tojson }};
+    const mpesaNumber = {{ mpesa_number|tojson }};
+    const whatsappGroupUrl = {{ whatsapp_group_url|tojson }};
+
+    async function copyMpesaNumber() {
+        try {
+            await navigator.clipboard.writeText(mpesaNumber);
+            showToast("M-Pesa number copied");
+        } catch (error) {
+            window.prompt("Copy the M-Pesa number:", mpesaNumber);
+        }
+    }
+
+    function showToast(message) {
+        const toast = document.getElementById("copyMessage");
+        toast.textContent = message;
+        toast.classList.add("is-visible");
+
+        window.setTimeout(
+            () => toast.classList.remove("is-visible"),
+            2200
+        );
+    }
+
+    function shareOnWhatsApp() {
+        const message = [
+            "In loving memory of " + memorialName + ".",
+            "Please visit the memorial, sign the condolence book and share a tribute:",
+            window.location.href,
+            whatsappGroupUrl
+                ? "Family WhatsApp group: " + whatsappGroupUrl
+                : ""
+        ].filter(Boolean).join(" ");
+
+        window.open(
+            "https://wa.me/?text=" + encodeURIComponent(message),
+            "_blank",
+            "noopener,noreferrer"
+        );
+    }
+</script>
+{% endblock %}
