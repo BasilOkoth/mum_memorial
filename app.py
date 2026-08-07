@@ -128,6 +128,11 @@ def whatsapp_phone_url(phone: str, memorial_name: str) -> str:
     return f"https://wa.me/{digits}?text={quote(message)}"
 
 
+def application_static_folder() -> str:
+    """Return the application's static folder path."""
+    return str(Path(__file__).resolve().parent / "static")
+
+
 def memorial_settings() -> dict[str, Any]:
     memorial_name = os.getenv(
         "MEMORIAL_NAME",
@@ -136,14 +141,24 @@ def memorial_settings() -> dict[str, Any]:
 
     organizer_phone = os.getenv("ORGANIZER_PHONE", "").strip()
 
-    gallery_photos = [
-        item.strip()
-        for item in os.getenv(
-            "GALLERY_PHOTOS",
-            "/static/mum.jpg",
-        ).split(",")
-        if item.strip()
-    ]
+    gallery_folder = Path(application_static_folder()) / "gallery"
+    allowed_extensions = {".jpg", ".jpeg", ".png", ".webp"}
+
+    gallery_photos = []
+    if gallery_folder.exists():
+        gallery_photos = [
+            f"/static/gallery/{photo.name}"
+            for photo in sorted(
+                gallery_folder.iterdir(),
+                key=lambda photo: photo.name.lower(),
+            )
+            if photo.is_file()
+            and photo.suffix.lower() in allowed_extensions
+        ]
+
+    # Keep at least Mum's main portrait visible if the gallery folder is empty.
+    if not gallery_photos:
+        gallery_photos = ["/static/mum.jpg"]
 
     return {
         "memorial_name": memorial_name,
