@@ -10,8 +10,7 @@
                 <p class="section-kicker">Private moderation</p>
                 <h1>Manage Condolence Book</h1>
                 <p class="admin-intro">
-                    Review messages before deciding whether they should remain
-                    visible in the public condolence book.
+                    Review, edit, hide or delete tributes shared on the memorial.
                 </p>
             </div>
 
@@ -22,7 +21,7 @@
                     target="_blank"
                     rel="noopener noreferrer"
                 >
-                    View Condolence Book
+                    View Memorial
                 </a>
 
                 <form method="post" action="{{ url_for('admin_logout') }}">
@@ -48,8 +47,8 @@
 
         <div class="admin-list">
             {% for candle in candles %}
-                <article class="admin-row">
-                    <div>
+                <article class="admin-row" id="entry-{{ candle.id }}">
+                    <div class="admin-entry-content">
                         <div class="admin-name">
                             {{ candle.participant_name }}
 
@@ -63,8 +62,58 @@
                         </p>
 
                         <small>
-                            Signed {{ candle.created_at.strftime("%d %b %Y, %H:%M") }}
+                            Shared {{ candle.created_at.strftime("%d %b %Y, %H:%M") }}
                         </small>
+
+                        <details class="admin-edit-panel">
+                            <summary class="secondary-button edit-summary">
+                                Edit Tribute
+                            </summary>
+
+                            <form
+                                class="admin-edit-form"
+                                method="post"
+                                action="{{ url_for('edit_candle', candle_id=candle.id) }}"
+                            >
+                                <input
+                                    type="hidden"
+                                    name="_csrf_token"
+                                    value="{{ csrf_token() }}"
+                                >
+
+                                <div class="field-group">
+                                    <label for="name-{{ candle.id }}">
+                                        Name
+                                    </label>
+                                    <input
+                                        id="name-{{ candle.id }}"
+                                        name="participant_name"
+                                        maxlength="80"
+                                        value="{{ candle.participant_name }}"
+                                    >
+                                </div>
+
+                                <div class="field-group">
+                                    <label for="message-{{ candle.id }}">
+                                        Tribute
+                                    </label>
+                                    <textarea
+                                        id="message-{{ candle.id }}"
+                                        name="message"
+                                        maxlength="600"
+                                        rows="6"
+                                        required
+                                    >{{ candle.message }}</textarea>
+                                </div>
+
+                                <button
+                                    class="secondary-button"
+                                    type="submit"
+                                >
+                                    Save Changes
+                                </button>
+                            </form>
+                        </details>
                     </div>
 
                     <div class="row-actions">
@@ -89,7 +138,7 @@
                         <form
                             method="post"
                             action="{{ url_for('delete_candle', candle_id=candle.id) }}"
-                            onsubmit="return confirm('Delete this condolence entry permanently?')"
+                            onsubmit="return confirm('Delete this tribute permanently?')"
                         >
                             <input
                                 type="hidden"
