@@ -329,7 +329,7 @@
 
         <div class="premium-candles condolence-entries">
             {% for candle in candles %}
-                <article class="premium-candle-card condolence-entry">
+                <article class="premium-candle-card condolence-entry" id="tribute-{{ candle.id }}">
                     <div class="condolence-entry-heading">
                         <span class="tribute-flame" aria-hidden="true"></span>
 
@@ -353,6 +353,58 @@
                     <span class="entry-candle-label">
                         Candle lit in remembrance
                     </span>
+
+                    {% if candle.id in owned_candle_ids %}
+                        <details class="tribute-owner-edit">
+                            <summary class="tribute-edit-link">
+                                Edit my tribute
+                            </summary>
+
+                            <form
+                                class="premium-form tribute-owner-edit-form"
+                                method="post"
+                                action="{{ url_for('edit_own_tribute', candle_id=candle.id) }}"
+                            >
+                                <input
+                                    type="hidden"
+                                    name="_csrf_token"
+                                    value="{{ csrf_token() }}"
+                                >
+
+                                <div class="field-group">
+                                    <label for="public-name-{{ candle.id }}">
+                                        Your name
+                                    </label>
+                                    <input
+                                        id="public-name-{{ candle.id }}"
+                                        name="participant_name"
+                                        maxlength="80"
+                                        value="{{ candle.participant_name }}"
+                                    >
+                                </div>
+
+                                <div class="field-group">
+                                    <label for="public-message-{{ candle.id }}">
+                                        Your tribute
+                                    </label>
+                                    <textarea
+                                        id="public-message-{{ candle.id }}"
+                                        name="message"
+                                        maxlength="600"
+                                        rows="6"
+                                        required
+                                    >{{ candle.message }}</textarea>
+                                </div>
+
+                                <button
+                                    class="premium-button premium-button-dark"
+                                    type="submit"
+                                >
+                                    Save Changes
+                                </button>
+                            </form>
+                        </details>
+                    {% endif %}
                 </article>
             {% else %}
                 <div class="premium-empty-wall">
