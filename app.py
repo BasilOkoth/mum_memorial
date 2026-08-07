@@ -8,7 +8,7 @@ from datetime import datetime, timedelta, timezone
 from functools import wraps
 from pathlib import Path
 from typing import Any, Callable, TypeVar
-from urllib.parse import quote
+from urllib.parse import parse_qs, quote, urlparse
 
 from dotenv import load_dotenv
 from flask import (
@@ -133,6 +133,34 @@ def application_static_folder() -> str:
     return str(Path(__file__).resolve().parent / "static")
 
 
+
+def video_embed_url(value: str | None) -> str:
+    candidate = safe_https_url(value)
+    if not candidate:
+        return ""
+
+    parsed = urlparse(candidate)
+    host = parsed.netloc.lower().removeprefix("www.")
+    video_id = ""
+
+    if host == "youtu.be":
+        video_id = parsed.path.strip("/").split("/")[0]
+    elif host in {"youtube.com", "m.youtube.com"}:
+        if parsed.path == "/watch":
+            video_id = parse_qs(parsed.query).get("v", [""])[0]
+        elif parsed.path.startswith("/live/"):
+            video_id = parsed.path.split("/live/", 1)[1].split("/")[0]
+        elif parsed.path.startswith("/embed/"):
+            video_id = parsed.path.split("/embed/", 1)[1].split("/")[0]
+
+    if video_id:
+        safe_id = "".join(ch for ch in video_id if ch.isalnum() or ch in "-_")
+        if safe_id:
+            return f"https://www.youtube.com/embed/{safe_id}"
+
+    return ""
+
+
 def memorial_settings() -> dict[str, Any]:
     memorial_name = os.getenv(
         "MEMORIAL_NAME",
@@ -140,6 +168,9 @@ def memorial_settings() -> dict[str, Any]:
     ).strip()
 
     organizer_phone = os.getenv("ORGANIZER_PHONE", "").strip()
+
+    livestream_url = safe_https_url(os.getenv("LIVESTREAM_URL", ""))
+    old_video_url = safe_https_url(os.getenv("OLD_VIDEO_URL", ""))
 
     gallery_folder = Path(application_static_folder()) / "gallery"
     allowed_extensions = {".jpg", ".jpeg", ".png", ".webp"}
@@ -198,6 +229,10 @@ def memorial_settings() -> dict[str, Any]:
             "Join the official WhatsApp group for contribution updates, "
             "transport coordination and family announcements.",
         ).strip(),
+        "livestream_url": livestream_url,
+        "livestream_embed_url": video_embed_url(livestream_url),
+        "old_video_url": old_video_url,
+        "old_video_embed_url": video_embed_url(old_video_url),
         "eulogy_filename": os.getenv(
             "EULOGY_FILENAME",
             "eulogy.pdf",
