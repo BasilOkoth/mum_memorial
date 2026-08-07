@@ -290,6 +290,13 @@ def register_routes(application: Flask) -> None:
 
         owned_candle_ids = set(session.get("owned_candles", []))
 
+        # Also recognize older tributes submitted before self-editing
+        # was introduced, using the same non-reversible IP hash.
+        current_ip_hash = client_ip_hash()
+        for candle in candles:
+            if candle.ip_hash == current_ip_hash:
+                owned_candle_ids.add(candle.id)
+
         return render_template(
             "index.html",
             candles=candles,
@@ -381,13 +388,16 @@ def register_routes(application: Flask) -> None:
         validate_csrf()
 
         owned_candle_ids = set(session.get("owned_candles", []))
-        if candle_id not in owned_candle_ids:
+        candle = db.get_or_404(Candle, candle_id)
+
+        owns_by_session = candle_id in owned_candle_ids
+        owns_by_ip = candle.ip_hash == client_ip_hash()
+
+        if not (owns_by_session or owns_by_ip):
             abort(
                 403,
-                description="You can only edit tributes submitted from this browser.",
+                description="You can only edit tributes submitted from this browser or connection.",
             )
-
-        candle = db.get_or_404(Candle, candle_id)
 
         participant_name = normalize_text(
             request.form.get("participant_name"),
