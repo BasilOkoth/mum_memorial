@@ -1,52 +1,68 @@
 services:
+  - type: web
+    name: memorial-candle
+    runtime: python
+    plan: starter
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn --workers 1 --threads 4 --timeout 120 app:app
+    healthCheckPath: /health
 
-type: web
-name: memorial-candle
-runtime: python
-plan: starter
-buildCommand: pip install -r requirements.txt
-startCommand: gunicorn --workers 1 --threads 4 --timeout 120 app
-healthCheckPath: /health
+    envVars:
+      - key: SECRET_KEY
+        generateValue: true
 
-envVars:
+      - key: ADMIN_PASSWORD
+        sync: false
 
-key: SECRET_KEY
-generateValue: true
-key: ADMIN_PASSWORD
-sync: false
-key: DATABASE_PATH
-value: /var/data/memorial.db
-key: MEMORIAL_NAME
-sync: false
-key: MEMORIAL_MESSAGE
-sync: false
-key: BURIAL_DATE
-sync: false
-key: BURIAL_VENUE
-sync: false
-key: PHOTO_URL
-value: /static/mum.jpg
-key: GALLERY_PHOTOS
-value: /static/mum.jpg,/static/mum-meldon.jpeg
-key: EULOGY_FILENAME
-value: eulogy.pdf
-key: MPESA_NUMBER
-sync: false
-key: MPESA_NAME
-sync: false
-key: CONTRIBUTION_PURPOSE
-sync: false
-key: ORGANIZER_PHONE
-sync: false
-key: WHATSAPP_GROUP_NAME
-value: Family Burial Contribution Group
-key: WHATSAPP_GROUP_URL
-value: https://chat.whatsapp.com/Ld8zx7Bey5w5QdR2jOP3bn
-key: FAMILY_UPDATE
-value: Join the official WhatsApp group for contribution updates, transport coordination and family announcements.
-LIVESTREAM_URL=
-OLD_VIDEO_URL=https://www.youtube.com/watch?v=r_3_HGehp30&t=1482s
-disk:
-name: memorial-data
-mountPath: /var/data
-sizeGB: 1
+      - key: DATABASE_PATH
+        value: /var/data/memorial.db
+
+      - key: MEMORIAL_NAME
+        sync: false
+
+      - key: MEMORIAL_MESSAGE
+        sync: false
+
+      - key: BURIAL_DATE
+        sync: false
+
+      - key: BURIAL_VENUE
+        sync: false
+
+      - key: PHOTO_URL
+        value: /static/mum.jpg
+
+      - key: EULOGY_FILENAME
+        value: eulogy.pdf
+
+      - key: MPESA_NUMBER
+        sync: false
+
+      - key: MPESA_NAME
+        sync: false
+
+      - key: CONTRIBUTION_PURPOSE
+        sync: false
+
+      - key: ORGANIZER_PHONE
+        sync: false
+
+      - key: WHATSAPP_GROUP_NAME
+        value: Family Burial Contribution Group
+
+      - key: WHATSAPP_GROUP_URL
+        value: https://chat.whatsapp.com/Ld8zx7Bey5w5QdR2jOP3bn
+
+      - key: FAMILY_UPDATE
+        value: Join the official WhatsApp group for contribution updates, transport coordination and family announcements.
+
+      - key: LIVESTREAM_URL
+        sync: false
+
+      - key: OLD_VIDEO_URL
+        value: "https://www.youtube.com/watch?v=r_3_HGehp30&t=1482s"
+
+    disk:
+      name: memorial-data
+      mountPath: /var/data
+      sizeGB: 1
