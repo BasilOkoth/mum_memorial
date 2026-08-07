@@ -2,35 +2,49 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+
     <meta
         name="viewport"
         content="width=device-width, initial-scale=1"
     >
+
     <meta
         name="description"
-        content="The digital condolence book and memorial page for {{ memorial_name }}."
+        content="The digital memorial and condolence book for {{ memorial_name }}."
     >
+
     <title>
-        {% block title %}Digital Condolence Book for {{ memorial_name }}{% endblock %}
+        {% block title %}
+            Digital Memorial for {{ memorial_name }}
+        {% endblock %}
     </title>
 
     <link
         rel="stylesheet"
         href="{{ url_for('static', filename='styles.css') }}"
     >
+
     <link
         rel="stylesheet"
         href="{{ url_for('static', filename='whatsapp-support.css') }}"
     >
+
     <link
         rel="stylesheet"
         href="{{ url_for('static', filename='candle-live.css') }}"
     >
+
     <link
         rel="stylesheet"
         href="{{ url_for('static', filename='condolence-book.css') }}"
     >
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='memorial-extras.css') }}"
+    >
 </head>
+
 <body>
     {% block body %}{% endblock %}
 </body>
