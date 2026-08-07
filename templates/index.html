@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}Condolence Book for {{ memorial_name }}{% endblock %}
+{% block title %}Memorial for {{ memorial_name }}{% endblock %}
 
 {% block body %}
 <main class="memorial-page">
@@ -36,21 +36,9 @@
                 <p class="premium-message">{{ memorial_message }}</p>
 
                 <div class="service-meta" aria-label="Burial details">
-                    <span>
-                        <svg viewBox="0 0 24 24" aria-hidden="true">
-                            <path d="M7 3v3m10-3v3M4 9h16M5 5h14a1 1 0 0 1 1 1v14H4V6a1 1 0 0 1 1-1Z"/>
-                        </svg>
-                        {{ burial_date }}
-                    </span>
-
+                    <span>{{ burial_date }}</span>
                     {% if burial_venue %}
-                        <span>
-                            <svg viewBox="0 0 24 24" aria-hidden="true">
-                                <path d="M20 10c0 5-8 11-8 11S4 15 4 10a8 8 0 1 1 16 0Z"/>
-                                <circle cx="12" cy="10" r="2.5"/>
-                            </svg>
-                            {{ burial_venue }}
-                        </span>
+                        <span>{{ burial_venue }}</span>
                     {% endif %}
                 </div>
 
@@ -59,8 +47,19 @@
                         class="premium-button premium-button-gold"
                         href="#light-candle"
                     >
-                        Sign the condolence book
+                        Leave a tribute
                     </a>
+
+                    {% if eulogy_available %}
+                        <a
+                            class="premium-button premium-button-dark"
+                            href="{{ url_for('read_eulogy') }}"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                        >
+                            Read Eulogy
+                        </a>
+                    {% endif %}
 
                     {% if whatsapp_group_url %}
                         <a
@@ -69,38 +68,102 @@
                             target="_blank"
                             rel="noopener noreferrer"
                         >
-                            <svg viewBox="0 0 24 24" aria-hidden="true">
-                                <path d="M20 11.5a8 8 0 0 1-11.8 7L4 20l1.4-4A8 8 0 1 1 20 11.5Z"/>
-                                <path d="M9 8.5c.7 2 2.3 3.6 4.4 4.3"/>
-                            </svg>
                             Join family WhatsApp
                         </a>
                     {% endif %}
                 </div>
 
                 <a class="candle-stat" href="#candle-wall">
-                    <span class="mini-flame" aria-hidden="true"></span>
                     <strong>{{ candle_count }}</strong>
-                    condolence entr{% if candle_count == 1 %}y{% else %}ies{% endif %}
-                    <span class="candle-stat-action">Read the book</span>
+                    tribute{% if candle_count != 1 %}s{% endif %}
+                    <span class="candle-stat-action">Read messages</span>
                 </a>
             </div>
         </div>
     </section>
 
-    <section class="premium-content condolence-actions" aria-label="Condolence and family support">
-        <article class="premium-panel remembrance-panel condolence-form-panel" id="light-candle">
+    <section class="premium-content story-panel-grid" aria-label="Memorial keepsakes">
+        <article class="premium-panel">
+            <p class="premium-kicker">Her life in pictures</p>
+            <h2>Photo Memories</h2>
+            <p class="panel-intro">
+                A collection of moments we shared with Mum — family gatherings,
+                celebrations and everyday memories that remain with us.
+            </p>
+
+            <div class="memorial-gallery">
+                {% for image in gallery_photos %}
+                    <a
+                        href="{{ image }}"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        class="gallery-item"
+                    >
+                        <img
+                            src="{{ image }}"
+                            alt="Memory of {{ memorial_name }}"
+                            loading="lazy"
+                        >
+                    </a>
+                {% endfor %}
+            </div>
+        </article>
+
+        <article class="premium-panel eulogy-panel">
+            <p class="premium-kicker">Her story and legacy</p>
+            <h2>Mum's Eulogy</h2>
+            <p class="panel-intro">
+                Read the story of her life, the people she loved, the values she carried
+                and the legacy she leaves with us.
+            </p>
+
+            {% if eulogy_available %}
+                <div class="eulogy-actions">
+                    <a
+                        class="premium-button premium-button-dark"
+                        href="{{ url_for('read_eulogy') }}"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                    >
+                        Read Eulogy
+                    </a>
+
+                    <a
+                        class="premium-button premium-button-gold"
+                        href="{{ url_for('download_eulogy') }}"
+                    >
+                        Download PDF
+                    </a>
+                </div>
+            {% else %}
+                <p class="soft-note">
+                    The eulogy will be available here once the final PDF is uploaded.
+                </p>
+            {% endif %}
+        </article>
+    </section>
+
+    <section
+        class="premium-content condolence-actions"
+        aria-label="Tributes and family support"
+    >
+        <article
+            class="premium-panel remembrance-panel condolence-form-panel"
+            id="light-candle"
+        >
             <div class="panel-heading">
                 <div>
                     <p class="premium-kicker">Digital condolence book</p>
-                    <h2>Sign the book</h2>
+                    <h2>Leave a tribute</h2>
                 </div>
                 <span class="candle-symbol" aria-hidden="true"></span>
             </div>
 
             <p class="panel-intro">
-                Share a condolence, prayer or cherished memory. When you sign,
-                a memorial candle will be lit beside your message.
+                Share a condolence, prayer, tribute or cherished memory of Mum.
+                You may write a message to the family, recall a moment you shared
+                with her, something she taught you, or simply leave words of love
+                and remembrance.
             </p>
 
             <form
@@ -128,6 +191,7 @@
                     <label for="participant_name">
                         Your name <span>optional</span>
                     </label>
+
                     <input
                         id="participant_name"
                         name="participant_name"
@@ -139,18 +203,20 @@
 
                 <div class="field-group">
                     <label for="message">
-                        Condolence, prayer or memory
+                        Condolence, tribute or memory
                     </label>
+
                     <textarea
                         id="message"
                         name="message"
-                        maxlength="280"
-                        rows="5"
+                        maxlength="600"
+                        rows="7"
                         required
-                        placeholder="Write your message to the family..."
+                        placeholder="Share your condolence, prayer, tribute or memory..."
                     ></textarea>
+
                     <small class="field-help">
-                        Please keep your message respectful and within 280 characters.
+                        You may write up to 600 characters.
                     </small>
                 </div>
 
@@ -158,14 +224,13 @@
                     class="premium-button premium-button-gold full-width sign-book-button"
                     type="submit"
                 >
-                    <span class="button-flame" aria-hidden="true"></span>
                     Sign the book &amp; light a candle
                 </button>
             </form>
 
             <p class="privacy-line">
                 No phone number is collected. Your name and message will appear
-                publicly in the condolence book.
+                publicly in the memorial book.
             </p>
         </article>
 
@@ -179,8 +244,8 @@
             </div>
 
             <p class="panel-intro">
-                Signing the condolence book is free. Financial contributions are
-                optional and will support funeral and burial arrangements.
+                Signing the memorial book is free. Financial contributions are
+                optional and support funeral and burial arrangements.
             </p>
 
             <div class="premium-mpesa-card">
@@ -196,6 +261,7 @@
                         <span>Recipient</span>
                         <b>{{ mpesa_name }}</b>
                     </div>
+
                     <div>
                         <span>Purpose</span>
                         <b>{{ contribution_purpose }}</b>
@@ -236,11 +302,6 @@
                     Share memorial
                 </button>
             </div>
-
-            <p class="security-note">
-                Confirm the recipient name in M-Pesa before sending. Never post
-                a complete M-Pesa confirmation message publicly.
-            </p>
         </article>
     </section>
 
@@ -251,8 +312,8 @@
     >
         <div class="wall-heading-premium">
             <div>
-                <p class="premium-kicker">Messages of love and remembrance</p>
-                <h2 id="book-title">Digital condolence book</h2>
+                <p class="premium-kicker">Messages, prayers and cherished memories</p>
+                <h2 id="book-title">Memorial &amp; Condolence Wall</h2>
             </div>
 
             <span>
@@ -262,8 +323,8 @@
         </div>
 
         <p class="book-introduction">
-            Messages shared by relatives, friends and everyone whose life was
-            touched by {{ memorial_name }}.
+            Condolences, tributes and memories shared by relatives, friends and
+            everyone whose life was touched by {{ memorial_name }}.
         </p>
 
         <div class="premium-candles condolence-entries">
@@ -271,10 +332,12 @@
                 <article class="premium-candle-card condolence-entry">
                     <div class="condolence-entry-heading">
                         <span class="tribute-flame" aria-hidden="true"></span>
+
                         <div>
                             <h3>{{ candle.participant_name }}</h3>
+
                             <time datetime="{{ candle.created_at.isoformat() }}">
-                                Signed {{ candle.created_at.strftime("%d %b %Y") }}
+                                Shared {{ candle.created_at.strftime("%d %b %Y") }}
                             </time>
                         </div>
                     </div>
@@ -294,13 +357,16 @@
             {% else %}
                 <div class="premium-empty-wall">
                     <span class="large-flame" aria-hidden="true"></span>
-                    <h3>Be the first to sign</h3>
+
+                    <h3>Be the first to leave a tribute</h3>
+
                     <p>
-                        Your message will begin this digital book of love,
-                        comfort and remembrance.
+                        Your words will begin this digital book of love,
+                        memories, comfort and remembrance.
                     </p>
+
                     <a href="#light-candle">
-                        Sign the condolence book
+                        Leave a tribute
                     </a>
                 </div>
             {% endfor %}
@@ -310,32 +376,34 @@
     <footer class="premium-footer">
         <p>Forever remembered. Forever loved.</p>
         <span>{{ memorial_name }} · {{ current_year }}</span>
-        <small class="designer-credit">
-            Designed with care by Barsil Chrysler
-        </small>
     </footer>
 </main>
 
-<nav class="premium-mobile-bar condolence-mobile-bar" aria-label="Quick actions">
-    <a href="#light-candle">Sign the book</a>
+<nav
+    class="premium-mobile-bar condolence-mobile-bar"
+    aria-label="Quick actions"
+>
+    <a href="#light-candle">Leave tribute</a>
 
-    {% if whatsapp_group_url %}
+    {% if eulogy_available %}
         <a
-            class="mobile-whatsapp"
-            href="{{ whatsapp_group_url }}"
+            href="{{ url_for('read_eulogy') }}"
             target="_blank"
             rel="noopener noreferrer"
         >
-            Join WhatsApp
-        </a>
-    {% else %}
-        <a class="mobile-whatsapp" href="#candle-wall">
-            Read messages
+            Eulogy
         </a>
     {% endif %}
+
+    <a href="#candle-wall">Read messages</a>
 </nav>
 
-<div id="copyMessage" class="premium-toast" role="status" aria-live="polite">
+<div
+    id="copyMessage"
+    class="premium-toast"
+    role="status"
+    aria-live="polite"
+>
     Copied
 </div>
 
@@ -367,8 +435,7 @@
     function shareOnWhatsApp() {
         const message = [
             "In loving memory of " + memorialName + ".",
-            "Please sign the digital condolence book, light a memorial candle",
-            "and share a message of comfort with the family:",
+            "Please visit the memorial, sign the condolence book and share a tribute:",
             window.location.href,
             whatsappGroupUrl
                 ? "Family WhatsApp group: " + whatsappGroupUrl
