@@ -1,0 +1,33 @@
+
+/* Contributor self-editing */
+.tribute-owner-edit {
+    margin-top: 16px;
+    padding-top: 14px;
+    border-top: 1px solid rgba(255,255,255,.08);
+}
+
+.tribute-edit-link {
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    font-weight: 700;
+    font-size: .92rem;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+}
+
+.tribute-owner-edit summary {
+    list-style: none;
+}
+
+.tribute-owner-edit summary::-webkit-details-marker {
+    display: none;
+}
+
+.tribute-owner-edit-form {
+    margin-top: 14px;
+}
+
+.tribute-owner-edit-form .premium-button {
+    margin-top: 4px;
+}
