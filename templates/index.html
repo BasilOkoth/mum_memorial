@@ -61,6 +61,12 @@
                         </a>
                     {% endif %}
 
+                    {% if livestream_url %}
+                        <a class="premium-button premium-button-gold" href="#media">
+                            Watch Funeral Live
+                        </a>
+                    {% endif %}
+
                     {% if whatsapp_group_url %}
                         <a
                             class="premium-button premium-button-whatsapp"
@@ -142,6 +148,82 @@
             {% endif %}
         </article>
     </section>
+
+
+    {% if livestream_url or old_video_url %}
+    <section class="premium-content media-section" id="media" aria-label="Memorial videos">
+        <div class="media-section-heading">
+            <p class="premium-kicker">Watch and remember</p>
+            <h2>Live Service &amp; Video Memories</h2>
+            <p class="panel-intro">
+                Join the funeral service online or revisit treasured moments captured on video.
+            </p>
+        </div>
+
+        <div class="media-grid">
+            {% if livestream_url %}
+            <article class="premium-panel media-card">
+                <div class="media-card-heading">
+                    <div>
+                        <p class="premium-kicker">Funeral service</p>
+                        <h3>Watch Funeral Live</h3>
+                    </div>
+                    <span class="live-badge">LIVE</span>
+                </div>
+
+                {% if livestream_embed_url %}
+                    <div class="video-frame">
+                        <iframe
+                            src="{{ livestream_embed_url }}"
+                            title="Funeral livestream for {{ memorial_name }}"
+                            loading="lazy"
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                            allowfullscreen
+                        ></iframe>
+                    </div>
+                {% else %}
+                    <a class="premium-button premium-button-gold"
+                       href="{{ livestream_url }}"
+                       target="_blank"
+                       rel="noopener noreferrer">
+                        Watch Funeral Live
+                    </a>
+                {% endif %}
+            </article>
+            {% endif %}
+
+            {% if old_video_url %}
+            <article class="premium-panel media-card">
+                <div class="media-card-heading">
+                    <div>
+                        <p class="premium-kicker">Treasured moments</p>
+                        <h3>Video Memories</h3>
+                    </div>
+                </div>
+
+                {% if old_video_embed_url %}
+                    <div class="video-frame">
+                        <iframe
+                            src="{{ old_video_embed_url }}"
+                            title="Video memory of {{ memorial_name }}"
+                            loading="lazy"
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                            allowfullscreen
+                        ></iframe>
+                    </div>
+                {% else %}
+                    <a class="premium-button premium-button-dark"
+                       href="{{ old_video_url }}"
+                       target="_blank"
+                       rel="noopener noreferrer">
+                        Watch Video Memory
+                    </a>
+                {% endif %}
+            </article>
+            {% endif %}
+        </div>
+    </section>
+    {% endif %}
 
     <section
         class="premium-content condolence-actions"
