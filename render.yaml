@@ -29,6 +29,12 @@ services:
       - key: BURIAL_VENUE
         sync: false
 
+      - key: BURIAL_DATETIME
+        sync: false
+
+      - key: BURIAL_MAP_URL
+        value: "https://www.google.com/maps/search/?api=1&query=Miyuga%2C%20Homa%20Bay%20County%2C%20Kenya"
+
       - key: PHOTO_URL
         value: /static/mum.jpg
 
@@ -51,10 +57,10 @@ services:
         value: Family Burial Contribution Group
 
       - key: WHATSAPP_GROUP_URL
-        value: https://chat.whatsapp.com/Ld8zx7Bey5w5QdR2jOP3bn
+        value: "https://chat.whatsapp.com/Ld8zx7Bey5w5QdR2jOP3bn"
 
       - key: FAMILY_UPDATE
-        value: Join the official WhatsApp group for contribution updates, transport coordination and family announcements.
+        value: "Join the official WhatsApp group for contribution updates, transport coordination and family announcements."
 
       - key: LIVESTREAM_URL
         sync: false
