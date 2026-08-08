@@ -1,0 +1,63 @@
+
+.service-card {
+    margin-top: 20px;
+    display: grid;
+    grid-template-columns: minmax(0, 1.25fr) minmax(220px, .75fr);
+    gap: 12px;
+}
+.service-countdown,
+.directions-button {
+    border: 1px solid rgba(255,255,255,.1);
+    border-radius: 18px;
+    background: rgba(255,255,255,.045);
+    backdrop-filter: blur(10px);
+}
+.service-countdown { padding: 16px 18px; }
+.service-countdown-label {
+    display: block;
+    margin-bottom: 5px;
+    font-size: .72rem;
+    font-weight: 800;
+    letter-spacing: .11em;
+    text-transform: uppercase;
+    opacity: .68;
+}
+.service-countdown > strong {
+    display: block;
+    font-size: 1rem;
+    margin-bottom: 12px;
+}
+.countdown-units { display: flex; gap: 18px; }
+.countdown-units div { display: grid; gap: 2px; }
+.countdown-units b { font-size: 1.5rem; line-height: 1; }
+.countdown-units span { font-size: .72rem; opacity: .65; }
+.service-complete-message { margin: 10px 0 0; font-size: .92rem; opacity: .82; }
+
+.directions-button {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 16px;
+    color: inherit;
+    text-decoration: none;
+    transition: transform .2s ease, background .2s ease;
+}
+.directions-button:hover {
+    transform: translateY(-2px);
+    background: rgba(255,255,255,.075);
+}
+.directions-icon {
+    display: grid;
+    place-items: center;
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    background: rgba(255,255,255,.08);
+}
+.directions-button span:nth-child(2) { display: grid; gap: 2px; }
+.directions-button small { font-size: .72rem; opacity: .65; }
+.directions-arrow { margin-left: auto; }
+
+@media (max-width: 720px) {
+    .service-card { grid-template-columns: 1fr; }
+}
