@@ -30,7 +30,7 @@ services:
         sync: false
 
       - key: BURIAL_DATETIME
-        sync: false
+        value: "2026-08-19T10:00:00+03:00"
 
       - key: BURIAL_MAP_URL
         value: "https://www.google.com/maps/search/?api=1&query=Miyuga%2C%20Homa%20Bay%20County%2C%20Kenya"
