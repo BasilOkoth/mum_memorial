@@ -206,6 +206,8 @@ def memorial_settings() -> dict[str, Any]:
             "Burial details will be shared with family and friends.",
         ).strip(),
         "burial_venue": os.getenv("BURIAL_VENUE", "").strip(),
+        "burial_datetime": os.getenv("BURIAL_DATETIME", "").strip(),
+        "burial_map_url": safe_https_url(os.getenv("BURIAL_MAP_URL", "")),
         "photo_url": os.getenv("PHOTO_URL", "").strip(),
         "mpesa_number": os.getenv("MPESA_NUMBER", "07XXXXXXXX").strip(),
         "mpesa_name": os.getenv(
