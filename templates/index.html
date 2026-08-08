@@ -35,45 +35,6 @@
                 <h1 id="memorial-title">{{ memorial_name }}</h1>
                 <p class="premium-message">{{ memorial_message }}</p>
 
-                {% if burial_datetime or burial_map_url or burial_venue %}
-                <section class="farewell-strip" aria-label="Funeral service details">
-                    <div class="farewell-strip-intro">
-                        <span class="farewell-kicker">Service of Farewell</span>
-                        <strong id="countdownHeadline">Until we gather to honour her</strong>
-                    </div>
-
-                    {% if burial_datetime %}
-                    <div class="farewell-strip-countdown" id="serviceCountdown"
-                         data-service-time="{{ burial_datetime }}">
-                        <div><strong id="daysLeft">--</strong><span>Days</span></div>
-                        <i aria-hidden="true"></i>
-                        <div><strong id="hoursLeft">--</strong><span>Hrs</span></div>
-                        <i aria-hidden="true"></i>
-                        <div><strong id="minutesLeft">--</strong><span>Min</span></div>
-                    </div>
-                    <p id="serviceCompleteMessage" class="farewell-complete" hidden>
-                        Laid to rest on {{ burial_date }}
-                    </p>
-                    {% endif %}
-
-                    <div class="farewell-strip-place">
-                        <small>{{ burial_date }}</small>
-                        {% if burial_venue %}
-                        <strong><span aria-hidden="true">⌖</span> {{ burial_venue }}</strong>
-                        {% endif %}
-                    </div>
-
-                    {% if burial_map_url %}
-                    <a class="farewell-strip-directions"
-                       href="{{ burial_map_url }}"
-                       target="_blank"
-                       rel="noopener noreferrer">
-                        <span aria-hidden="true">↗</span>
-                        <strong>Directions</strong>
-                    </a>
-                    {% endif %}
-                </section>
-                {% endif %}
 
                 <div class="hero-actions">
                     <a
@@ -119,6 +80,46 @@
                 </a>
             </div>
         </div>
+
+        {% if burial_datetime or burial_map_url or burial_venue %}
+        <section class="farewell-wide-strip" aria-label="Funeral service details">
+            <div class="farewell-wide-intro">
+                <span>SERVICE OF FAREWELL</span>
+                <strong id="countdownHeadline">Until we gather to honour her</strong>
+            </div>
+
+            {% if burial_datetime %}
+            <div class="farewell-wide-countdown" id="serviceCountdown"
+                 data-service-time="{{ burial_datetime }}">
+                <div><b id="daysLeft">--</b><small>Days</small></div>
+                <span aria-hidden="true">·</span>
+                <div><b id="hoursLeft">--</b><small>Hours</small></div>
+                <span aria-hidden="true">·</span>
+                <div><b id="minutesLeft">--</b><small>Minutes</small></div>
+            </div>
+            <p id="serviceCompleteMessage" class="farewell-wide-complete" hidden>
+                Laid to rest on {{ burial_date }}
+            </p>
+            {% endif %}
+
+            <div class="farewell-wide-meta">
+                <small>{{ burial_date }}</small>
+                {% if burial_venue %}
+                <strong><span aria-hidden="true">⌖</span> {{ burial_venue }}</strong>
+                {% endif %}
+            </div>
+
+            {% if burial_map_url %}
+            <a class="farewell-wide-directions"
+               href="{{ burial_map_url }}"
+               target="_blank"
+               rel="noopener noreferrer">
+                <span aria-hidden="true">↗</span>
+                <strong>Directions</strong>
+            </a>
+            {% endif %}
+        </section>
+        {% endif %}
     </section>
 
     <section class="premium-content story-panel-grid" aria-label="Memorial keepsakes">
