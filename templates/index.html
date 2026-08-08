@@ -35,45 +35,44 @@
                 <h1 id="memorial-title">{{ memorial_name }}</h1>
                 <p class="premium-message">{{ memorial_message }}</p>
 
-                <div class="service-meta" aria-label="Burial details">
-                    <span>{{ burial_date }}</span>
-                    {% if burial_venue %}
-                        <span>{{ burial_venue }}</span>
-                    {% endif %}
-                </div>
-
-                {% if burial_datetime or burial_map_url %}
-                <div class="service-card">
-                    {% if burial_datetime %}
-                    <div class="service-countdown" id="serviceCountdown"
-                         data-service-time="{{ burial_datetime }}">
-                        <span class="service-countdown-label">Funeral service</span>
-                        <strong id="countdownHeadline">Service approaching</strong>
-                        <div class="countdown-units" id="countdownUnits">
-                            <div><b id="daysLeft">--</b><span>Days</span></div>
-                            <div><b id="hoursLeft">--</b><span>Hours</span></div>
-                            <div><b id="minutesLeft">--</b><span>Minutes</span></div>
-                        </div>
-                        <p id="serviceCompleteMessage" class="service-complete-message" hidden>
-                            Laid to rest on {{ burial_date }}
-                        </p>
+                {% if burial_datetime or burial_map_url or burial_venue %}
+                <section class="farewell-strip" aria-label="Funeral service details">
+                    <div class="farewell-strip-intro">
+                        <span class="farewell-kicker">Service of Farewell</span>
+                        <strong id="countdownHeadline">Until we gather to honour her</strong>
                     </div>
+
+                    {% if burial_datetime %}
+                    <div class="farewell-strip-countdown" id="serviceCountdown"
+                         data-service-time="{{ burial_datetime }}">
+                        <div><strong id="daysLeft">--</strong><span>Days</span></div>
+                        <i aria-hidden="true"></i>
+                        <div><strong id="hoursLeft">--</strong><span>Hrs</span></div>
+                        <i aria-hidden="true"></i>
+                        <div><strong id="minutesLeft">--</strong><span>Min</span></div>
+                    </div>
+                    <p id="serviceCompleteMessage" class="farewell-complete" hidden>
+                        Laid to rest on {{ burial_date }}
+                    </p>
                     {% endif %}
+
+                    <div class="farewell-strip-place">
+                        <small>{{ burial_date }}</small>
+                        {% if burial_venue %}
+                        <strong><span aria-hidden="true">⌖</span> {{ burial_venue }}</strong>
+                        {% endif %}
+                    </div>
 
                     {% if burial_map_url %}
-                    <a class="directions-button"
+                    <a class="farewell-strip-directions"
                        href="{{ burial_map_url }}"
                        target="_blank"
                        rel="noopener noreferrer">
-                        <span class="directions-icon">⌖</span>
-                        <span>
-                            <small>Travelling to the service?</small>
-                            <strong>Get Directions</strong>
-                        </span>
-                        <span class="directions-arrow">→</span>
+                        <span aria-hidden="true">↗</span>
+                        <strong>Directions</strong>
                     </a>
                     {% endif %}
-                </div>
+                </section>
                 {% endif %}
 
                 <div class="hero-actions">
@@ -611,14 +610,13 @@
         const target = new Date(countdown.dataset.serviceTime);
         if (Number.isNaN(target.getTime())) return;
 
-        const units = document.getElementById("countdownUnits");
-        const headline = document.getElementById("countdownHeadline");
+                const headline = document.getElementById("countdownHeadline");
         const complete = document.getElementById("serviceCompleteMessage");
 
         function updateCountdown() {
             const diff = target.getTime() - Date.now();
             if (diff <= 0) {
-                units.hidden = true;
+                countdown.hidden = true;
                 headline.textContent = "Forever remembered";
                 complete.hidden = false;
                 return true;
