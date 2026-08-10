@@ -1,4 +1,5 @@
 /* Photo Memories and Eulogy — preserved */
+
 .story-panel-grid {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -25,7 +26,7 @@
     height: 100%;
     object-fit: cover;
     display: block;
-    transition: transform .25s ease;
+    transition: transform 0.25s ease;
 }
 
 .gallery-item:hover img {
@@ -41,10 +42,14 @@
 
 .soft-note {
     margin-top: 18px;
-    opacity: .75;
+    opacity: 0.75;
 }
 
-/* Full-width premium funeral strip */
+
+/* =========================================================
+   Full-width premium funeral strip
+   ========================================================= */
+
 .farewell-wide-strip {
     position: relative;
     z-index: 2;
@@ -52,14 +57,25 @@
     max-width: 1180px;
     margin: 24px auto 0;
     display: grid;
-    grid-template-columns: minmax(180px, 1.2fr) auto minmax(190px, .9fr) auto;
+    grid-template-columns:
+        minmax(180px, 1.2fr)
+        auto
+        minmax(190px, 0.9fr)
+        auto;
     align-items: center;
     gap: 18px;
     padding: 14px 18px;
     border-radius: 18px;
-    border: 1px solid rgba(226, 195, 132, .25);
-    background: linear-gradient(135deg, rgba(21, 20, 19, .94), rgba(33, 29, 25, .91));
-    box-shadow: 0 14px 30px rgba(0,0,0,.18), inset 0 1px 0 rgba(255,255,255,.04);
+    border: 1px solid rgba(226, 195, 132, 0.25);
+    background:
+        linear-gradient(
+            135deg,
+            rgba(21, 20, 19, 0.94),
+            rgba(33, 29, 25, 0.91)
+        );
+    box-shadow:
+        0 14px 30px rgba(0, 0, 0, 0.18),
+        inset 0 1px 0 rgba(255, 255, 255, 0.04);
     overflow: visible;
 }
 
@@ -70,18 +86,18 @@
 }
 
 .farewell-wide-intro span {
-    font-size: .58rem;
+    font-size: 0.58rem;
     font-weight: 800;
-    letter-spacing: .16em;
+    letter-spacing: 0.16em;
     color: #d9bd83;
 }
 
 .farewell-wide-intro strong {
     font-family: Georgia, "Times New Roman", serif;
-    font-size: .98rem;
+    font-size: 0.98rem;
     font-weight: 500;
     line-height: 1.2;
-    color: rgba(255,255,255,.94);
+    color: rgba(255, 255, 255, 0.94);
 }
 
 .farewell-wide-countdown {
@@ -108,15 +124,15 @@
 }
 
 .farewell-wide-countdown small {
-    font-size: .60rem;
+    font-size: 0.6rem;
     font-weight: 800;
-    letter-spacing: .08em;
+    letter-spacing: 0.08em;
     text-transform: uppercase;
-    color: rgba(255,255,255,.48);
+    color: rgba(255, 255, 255, 0.48);
 }
 
 .farewell-wide-countdown > span {
-    color: rgba(226,195,132,.48);
+    color: rgba(226, 195, 132, 0.48);
 }
 
 .farewell-wide-meta {
@@ -126,15 +142,15 @@
 }
 
 .farewell-wide-meta small {
-    font-size: .63rem;
+    font-size: 0.63rem;
     line-height: 1.25;
-    color: rgba(255,255,255,.50);
+    color: rgba(255, 255, 255, 0.50);
 }
 
 .farewell-wide-meta strong {
-    font-size: .83rem;
+    font-size: 0.83rem;
     line-height: 1.25;
-    color: rgba(255,255,255,.90);
+    color: rgba(255, 255, 255, 0.90);
 }
 
 .farewell-wide-meta strong span {
@@ -149,30 +165,119 @@
     min-height: 40px;
     padding: 0 14px;
     border-radius: 12px;
-    border: 1px solid rgba(226,195,132,.25);
-    background: rgba(226,195,132,.10);
+    border: 1px solid rgba(226, 195, 132, 0.25);
+    background: rgba(226, 195, 132, 0.10);
     color: #f4e5c5;
     text-decoration: none;
     white-space: nowrap;
+    transition:
+        background 0.2s ease,
+        transform 0.2s ease;
 }
 
 .farewell-wide-directions:hover {
-    background: rgba(226,195,132,.16);
+    background: rgba(226, 195, 132, 0.16);
+    transform: translateY(-1px);
 }
 
 .farewell-wide-directions strong {
-    font-size: .75rem;
+    font-size: 0.75rem;
 }
 
 .farewell-wide-complete {
     margin: 0;
     color: #f1ddb2;
     font-family: Georgia, "Times New Roman", serif;
-    font-size: .9rem;
+    font-size: 0.9rem;
 }
 
-/* Tablet: two balanced rows, never clipped */
+
+/* =========================================================
+   Live Service & Video Memories
+   ========================================================= */
+
+.media-section {
+    margin-top: 28px;
+}
+
+.media-section-heading {
+    margin-bottom: 20px;
+}
+
+.media-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 22px;
+    align-items: start;
+}
+
+.media-card {
+    min-width: 0;
+    overflow: hidden;
+}
+
+.media-card-heading {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 14px;
+    margin-bottom: 16px;
+}
+
+.media-card-heading > div {
+    min-width: 0;
+}
+
+.media-card-heading h3 {
+    margin: 4px 0 0;
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: 1.35rem;
+    font-weight: 500;
+    line-height: 1.25;
+}
+
+.live-badge {
+    display: inline-flex;
+    flex: 0 0 auto;
+    align-items: center;
+    justify-content: center;
+    padding: 6px 10px;
+    border-radius: 999px;
+    background: #b91c1c;
+    color: #ffffff;
+    font-size: 0.67rem;
+    font-weight: 900;
+    letter-spacing: 0.12em;
+    box-shadow: 0 6px 18px rgba(185, 28, 28, 0.25);
+}
+
+.video-frame {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    overflow: hidden;
+    border-radius: 18px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    background: #000000;
+    box-shadow: 0 16px 35px rgba(0, 0, 0, 0.24);
+}
+
+.video-frame iframe {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    border: 0;
+    display: block;
+}
+
+
+/* =========================================================
+   Tablet
+   ========================================================= */
+
 @media (max-width: 900px) {
+
     .farewell-wide-strip {
         grid-template-columns: 1fr auto;
         gap: 10px 16px;
@@ -200,8 +305,29 @@
     }
 }
 
-/* Mobile: compact, no horizontal clipping */
+
+/* =========================================================
+   Video cards collapse earlier for smaller screens
+   ========================================================= */
+
+@media (max-width: 760px) {
+
+    .media-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .media-card-heading h3 {
+        font-size: 1.25rem;
+    }
+}
+
+
+/* =========================================================
+   Mobile
+   ========================================================= */
+
 @media (max-width: 560px) {
+
     .farewell-wide-strip {
         width: calc(100% - 24px);
         grid-template-columns: 1fr;
@@ -214,8 +340,8 @@
         justify-content: center;
         gap: 7px;
         padding: 7px 0;
-        border-top: 1px solid rgba(255,255,255,.06);
-        border-bottom: 1px solid rgba(255,255,255,.06);
+        border-top: 1px solid rgba(255, 255, 255, 0.06);
+        border-bottom: 1px solid rgba(255, 255, 255, 0.06);
     }
 
     .farewell-wide-countdown b {
@@ -223,7 +349,7 @@
     }
 
     .farewell-wide-countdown small {
-        font-size: .54rem;
+        font-size: 0.54rem;
     }
 
     .farewell-wide-meta,
@@ -234,9 +360,28 @@
     .farewell-wide-directions {
         width: 100%;
     }
+
+    .media-section {
+        margin-top: 22px;
+    }
+
+    .media-grid {
+        gap: 16px;
+    }
+
+    .video-frame {
+        border-radius: 14px;
+    }
+
+    .live-badge {
+        padding: 5px 8px;
+        font-size: 0.62rem;
+    }
 }
 
+
 @media (max-width: 520px) {
+
     .memorial-gallery {
         gap: 8px;
     }
