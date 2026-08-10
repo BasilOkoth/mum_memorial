@@ -276,9 +276,12 @@
                         ></iframe>
                     </div>
                 {% else %}
-                    <div class="video-unavailable" role="status">
-                        <p>This video cannot currently be played inside the memorial.</p>
-                    </div>
+                    <a class="premium-button premium-button-dark"
+                       href="{{ video.url }}"
+                       target="_blank"
+                       rel="noopener noreferrer">
+                        Watch Video Memory
+                    </a>
                 {% endif %}
             </article>
             {% endfor %}
