@@ -257,8 +257,8 @@
 
         <div class="media-grid">
             {% for video in video_memories %}
-            <article class="premium-panel media-card">
-                <div class="media-card-heading">
+            <article class="premium-panel livestream-card">
+                <div class="livestream-card-header">
                     <div>
                         <p class="premium-kicker">Treasured moments</p>
                         <h3>Video Memory {{ loop.index }}</h3>
@@ -266,7 +266,7 @@
                 </div>
 
                 {% if video.embed_url %}
-                    <div class="video-frame">
+                    <div class="video-frame livestream-frame">
                         <iframe
                             src="{{ video.embed_url }}"
                             title="Video memory {{ loop.index }} of {{ memorial_name }}"
@@ -276,12 +276,9 @@
                         ></iframe>
                     </div>
                 {% else %}
-                    <a class="premium-button premium-button-dark"
-                       href="{{ video.url }}"
-                       target="_blank"
-                       rel="noopener noreferrer">
-                        Watch Video Memory
-                    </a>
+                    <div class="livestream-fallback">
+                        <p>This video is not currently available inside the memorial.</p>
+                    </div>
                 {% endif %}
             </article>
             {% endfor %}
