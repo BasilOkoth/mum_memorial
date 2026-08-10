@@ -190,17 +190,22 @@
         id="live-service"
         aria-label="Funeral livestream"
     >
-        <div class="media-section-heading">
+        <div class="livestream-intro">
             <p class="premium-kicker">Join us online</p>
             <h2>Funeral Livestream</h2>
             <p class="panel-intro">
-                Join family and friends as we gather to celebrate Mum's life
-                and give her a loving farewell.
+                Join us online as family and friends gather to honour Mum
+                and celebrate her life.
             </p>
+
+            <div class="livestream-status">
+                <span class="live-dot" aria-hidden="true"></span>
+                <span>Funeral Service</span>
+            </div>
         </div>
 
         <article class="premium-panel livestream-card">
-            <div class="media-card-heading">
+            <div class="livestream-card-header">
                 <div>
                     <p class="premium-kicker">Funeral service</p>
                     <h3>Watch the Service Live</h3>
@@ -219,14 +224,17 @@
                     ></iframe>
                 </div>
             {% else %}
-                <a
-                    class="premium-button premium-button-gold"
-                    href="{{ livestream_url }}"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                >
-                    Watch Funeral Live
-                </a>
+                <div class="livestream-fallback">
+                    <p>The livestream will open on YouTube.</p>
+                    <a
+                        class="premium-button premium-button-gold"
+                        href="{{ livestream_url }}"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                    >
+                        Watch Funeral Live
+                    </a>
+                </div>
             {% endif %}
         </article>
     </section>
@@ -234,7 +242,7 @@
 
     {% if video_memories %}
     <section
-        class="premium-content media-section"
+        class="premium-content media-section video-memories-section"
         id="media"
         aria-label="Video memories"
     >
