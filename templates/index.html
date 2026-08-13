@@ -35,7 +35,6 @@
                 <h1 id="memorial-title">{{ memorial_name }}</h1>
                 <p class="premium-message">{{ memorial_message }}</p>
 
-
                 <div class="hero-actions">
                     <a
                         class="premium-button premium-button-gold"
@@ -182,7 +181,6 @@
             {% endif %}
         </article>
     </section>
-
 
     {% if livestream_url %}
     <section
@@ -490,6 +488,13 @@
                         Candle lit in remembrance
                     </span>
 
+                    {% if candle.id in acknowledged_candle_ids %}
+                        <div class="family-tribute-acknowledgement">
+                            <span aria-hidden="true">♥</span>
+                            <strong>Acknowledged with love by the family</strong>
+                        </div>
+                    {% endif %}
+
                     {% if candle.id in owned_candle_ids %}
                         <details class="tribute-owner-edit">
                             <summary class="tribute-edit-link">
@@ -561,12 +566,29 @@
         </div>
     </section>
 
+    {% if family_acknowledgement %}
+    <section
+        class="family-thanks-section"
+        aria-labelledby="family-thanks-title"
+    >
+        <div class="family-thanks-mark" aria-hidden="true">♥</div>
+        <p class="premium-kicker">From our family</p>
+        <h2 id="family-thanks-title">With heartfelt gratitude</h2>
+        <p class="family-thanks-message">
+            {{ family_acknowledgement }}
+        </p>
+        <p class="family-thanks-signoff">
+            With love and gratitude · The family of {{ memorial_name }}
+        </p>
+    </section>
+    {% endif %}
+
     <footer class="premium-footer">
         <p>Forever remembered. Forever loved.</p>
         <span>{{ memorial_name }} · {{ current_year }}</span>
 
         <small class="designer-credit">
-            Designed with care by Barsil Chrysler
+            Made with care by Basil
         </small>
     </footer>
 </main>
@@ -624,14 +646,13 @@
         );
     }
 
-
     function initialiseServiceCountdown() {
         const countdown = document.getElementById("serviceCountdown");
         if (!countdown) return;
         const target = new Date(countdown.dataset.serviceTime);
         if (Number.isNaN(target.getTime())) return;
 
-                const headline = document.getElementById("countdownHeadline");
+        const headline = document.getElementById("countdownHeadline");
         const complete = document.getElementById("serviceCompleteMessage");
 
         function updateCountdown() {
