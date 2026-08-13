@@ -174,6 +174,121 @@
     color: var(--premium-gold);
 }
 
+/* Family acknowledgement features */
+
+.family-tribute-acknowledgement {
+    width: fit-content;
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    margin-top: 14px;
+    padding: 7px 10px;
+    border: 1px solid rgba(217, 182, 111, 0.22);
+    border-radius: 999px;
+    color: #dfc58f;
+    background: rgba(217, 182, 111, 0.065);
+    font-size: 0.68rem;
+    line-height: 1.25;
+}
+
+.family-tribute-acknowledgement span {
+    color: #d7a49c;
+    font-size: 0.75rem;
+}
+
+.family-tribute-acknowledgement strong {
+    font-weight: 750;
+}
+
+.family-ack-badge {
+    display: inline-flex;
+    margin-left: 8px;
+    padding: 5px 8px;
+    border: 1px solid rgba(217, 182, 111, 0.24);
+    border-radius: 999px;
+    color: #e5ca92;
+    background: rgba(217, 182, 111, 0.07);
+    font-size: 0.67rem;
+    font-weight: 800;
+}
+
+.acknowledge-button {
+    width: 100%;
+    padding: 13px 16px;
+    border: 1px solid rgba(217, 182, 111, 0.34);
+    border-radius: 14px;
+    cursor: pointer;
+    color: #f4dfb5;
+    background: rgba(217, 182, 111, 0.09);
+    font: inherit;
+    font-weight: 850;
+    text-align: center;
+}
+
+.acknowledge-button:hover {
+    background: rgba(217, 182, 111, 0.15);
+}
+
+.family-thanks-section {
+    position: relative;
+    overflow: hidden;
+    margin-top: 22px;
+    padding: clamp(34px, 6vw, 64px) clamp(24px, 7vw, 78px);
+    border: 1px solid rgba(217, 182, 111, 0.18);
+    border-radius: 28px;
+    text-align: center;
+    background:
+        radial-gradient(
+            circle at 50% 0,
+            rgba(217, 182, 111, 0.10),
+            transparent 48%
+        ),
+        linear-gradient(
+            145deg,
+            rgba(24, 24, 27, 0.96),
+            rgba(14, 14, 16, 0.98)
+        );
+    box-shadow: 0 22px 60px rgba(0, 0, 0, 0.24);
+}
+
+.family-thanks-mark {
+    width: 42px;
+    height: 42px;
+    display: grid;
+    place-items: center;
+    margin: 0 auto 15px;
+    border: 1px solid rgba(217, 182, 111, 0.22);
+    border-radius: 50%;
+    color: #d7a49c;
+    background: rgba(217, 182, 111, 0.055);
+    font-size: 1rem;
+}
+
+.family-thanks-section h2 {
+    margin: 0;
+    color: var(--premium-text);
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: clamp(2rem, 5vw, 3.25rem);
+    font-weight: 400;
+    letter-spacing: -0.025em;
+}
+
+.family-thanks-message {
+    max-width: 760px;
+    margin: 19px auto 0;
+    color: #cfc8bd;
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: clamp(1rem, 2vw, 1.16rem);
+    line-height: 1.8;
+}
+
+.family-thanks-signoff {
+    margin: 22px 0 0;
+    color: #8c857b;
+    font-size: 0.78rem;
+    font-weight: 700;
+}
+
 @media (max-width: 760px) {
     .condolence-actions {
         display: flex;
@@ -198,6 +313,18 @@
 
     .book-introduction {
         margin-top: 0;
+    }
+}
+
+@media (max-width: 560px) {
+    .family-thanks-section {
+        margin-top: 18px;
+        padding: 34px 20px 38px;
+        border-radius: 22px;
+    }
+
+    .family-thanks-message {
+        line-height: 1.7;
     }
 }
 
