@@ -60,6 +60,22 @@ class Candle(db.Model):
     )
 
 
+class TributeAcknowledgement(db.Model):
+    """A family acknowledgement attached to one tribute."""
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    candle_id: Mapped[int] = mapped_column(
+        nullable=False,
+        unique=True,
+        index=True,
+    )
+    acknowledged_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        nullable=False,
+        default=lambda: datetime.now(timezone.utc),
+    )
+
+
 def _database_uri() -> str:
     database_url = os.getenv("DATABASE_URL", "").strip()
 
@@ -133,7 +149,6 @@ def application_static_folder() -> str:
     return str(Path(__file__).resolve().parent / "static")
 
 
-
 def video_embed_url(value: str | None) -> str:
     candidate = safe_https_url(value)
     if not candidate:
@@ -191,7 +206,6 @@ def memorial_settings() -> dict[str, Any]:
             and photo.suffix.lower() in allowed_extensions
         ]
 
-    # Keep at least Mum's main portrait visible if the gallery folder is empty.
     if not gallery_photos:
         gallery_photos = ["/static/mum.jpg"]
 
@@ -234,6 +248,13 @@ def memorial_settings() -> dict[str, Any]:
             "FAMILY_UPDATE",
             "Join the official WhatsApp group for contribution updates, "
             "transport coordination and family announcements.",
+        ).strip(),
+        "family_acknowledgement": os.getenv(
+            "FAMILY_ACKNOWLEDGEMENT",
+            "Our family is deeply grateful to everyone who stood with us, "
+            "shared memories, sent messages, prayed with us, contributed, "
+            "travelled and honoured this life with us. Every tribute on this "
+            "memorial is part of a story we will continue to carry with love.",
         ).strip(),
         "livestream_url": livestream_url,
         "livestream_embed_url": video_embed_url(livestream_url),
@@ -347,9 +368,12 @@ def register_routes(application: Flask) -> None:
         eulogy_available = eulogy_path.exists()
 
         owned_candle_ids = set(session.get("owned_candles", []))
+        acknowledged_candle_ids = set(
+            db.session.scalars(
+                select(TributeAcknowledgement.candle_id)
+            ).all()
+        )
 
-        # Also recognize older tributes submitted before self-editing
-        # was introduced, using the same non-reversible IP hash.
         current_ip_hash = client_ip_hash()
         for candle in candles:
             if candle.ip_hash == current_ip_hash:
@@ -362,6 +386,7 @@ def register_routes(application: Flask) -> None:
             photo_url=photo_url,
             eulogy_available=eulogy_available,
             owned_candle_ids=owned_candle_ids,
+            acknowledged_candle_ids=acknowledged_candle_ids,
         )
 
     @application.post("/light-candle")
@@ -514,7 +539,39 @@ def register_routes(application: Flask) -> None:
             select(Candle).order_by(Candle.created_at.desc())
         ).all()
 
-        return render_template("admin.html", candles=candles)
+        acknowledged_candle_ids = set(
+            db.session.scalars(
+                select(TributeAcknowledgement.candle_id)
+            ).all()
+        )
+
+        return render_template(
+            "admin.html",
+            candles=candles,
+            acknowledged_candle_ids=acknowledged_candle_ids,
+        )
+
+    @application.post("/admin/candles/<int:candle_id>/acknowledge")
+    @admin_required
+    def acknowledge_candle(candle_id: int) -> Any:
+        validate_csrf()
+        db.get_or_404(Candle, candle_id)
+
+        acknowledgement = db.session.scalar(
+            select(TributeAcknowledgement).where(
+                TributeAcknowledgement.candle_id == candle_id
+            )
+        )
+
+        if acknowledgement:
+            db.session.delete(acknowledgement)
+            flash("Family acknowledgement removed.", "success")
+        else:
+            db.session.add(TributeAcknowledgement(candle_id=candle_id))
+            flash("Tribute acknowledged with love.", "success")
+
+        db.session.commit()
+        return redirect(url_for("admin_dashboard") + f"#entry-{candle_id}")
 
     @application.post("/admin/candles/<int:candle_id>/toggle")
     @admin_required
@@ -561,6 +618,15 @@ def register_routes(application: Flask) -> None:
     def delete_candle(candle_id: int) -> Any:
         validate_csrf()
         candle = db.get_or_404(Candle, candle_id)
+
+        acknowledgement = db.session.scalar(
+            select(TributeAcknowledgement).where(
+                TributeAcknowledgement.candle_id == candle_id
+            )
+        )
+        if acknowledgement:
+            db.session.delete(acknowledgement)
+
         db.session.delete(candle)
         db.session.commit()
 
