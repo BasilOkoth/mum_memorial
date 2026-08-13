@@ -10,7 +10,7 @@
                 <p class="section-kicker">Private moderation</p>
                 <h1>Manage Condolence Book</h1>
                 <p class="admin-intro">
-                    Review, edit, hide or delete tributes shared on the memorial.
+                    Review, acknowledge, edit, hide or delete tributes shared on the memorial.
                 </p>
             </div>
 
@@ -54,6 +54,12 @@
 
                             {% if not candle.is_visible %}
                                 <span class="hidden-badge">Hidden</span>
+                            {% endif %}
+
+                            {% if candle.id in acknowledged_candle_ids %}
+                                <span class="family-ack-badge">
+                                    Acknowledged with love
+                                </span>
                             {% endif %}
                         </div>
 
@@ -117,6 +123,24 @@
                     </div>
 
                     <div class="row-actions">
+                        <form
+                            method="post"
+                            action="{{ url_for('acknowledge_candle', candle_id=candle.id) }}"
+                        >
+                            <input
+                                type="hidden"
+                                name="_csrf_token"
+                                value="{{ csrf_token() }}"
+                            >
+                            <button class="acknowledge-button" type="submit">
+                                {% if candle.id in acknowledged_candle_ids %}
+                                    Remove acknowledgement
+                                {% else %}
+                                    Acknowledge with love
+                                {% endif %}
+                            </button>
+                        </form>
+
                         <form
                             method="post"
                             action="{{ url_for('toggle_candle', candle_id=candle.id) }}"
