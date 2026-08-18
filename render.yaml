@@ -63,7 +63,7 @@ services:
         value: "Join the official WhatsApp group for contribution updates, transport coordination and family announcements."
 
       - key: LIVESTREAM_URL
-        value: "https://www.youtube.com/watch?v=MzxQsNAAjdw"
+        value: "https://www.youtube.com/live/K3f21SePb_4?si=Y0dUSMx34qz-aUJ4"
 
       - key: VIDEO_MEMORIES
         value: "https://www.youtube.com/watch?v=r_3_HGehp30&t=1482s,https://youtu.be/fA0kE9eZKNQ"
